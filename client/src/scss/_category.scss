@@ -2,39 +2,3 @@
     /* Change your font family */
     font-family: sans-serif;
 }
-.catagory__table__container {
-
-}
-.category__table {
-    border-collapse: collapse;
-    margin: 10px 0;
-    font-size: 16px;
-    min-width: 1200px;
-    border-radius: 5px 5px 0 0;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-
-    thead tr {
-        background-color: #2f4050;
-        color: #ffffff;
-        text-align: left;
-        font-weight: bold;
-    }
-    th{
-        padding: 10px 10px;
-    }
-    td{
-        padding: 10px 0px;
-    }
-    tbody tr {
-        border-bottom: 1px solid #dddddd;
-    }
-    tbody tr:last-of-type {
-        border-bottom: 2px solid #dddddd;
-    }
-    tbody tr.category__active-row {
-        font-weight: bold;
-        color: #dddddd;
-    }
-}
-

@@ -1,11 +1,12 @@
 import React from "react";
 import Axios from "axios";
+import ReactPaginate from "react-paginate";
 import { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
 import "../scss/_category.scss";
+import "../scss/_global.scss";
 import Button from "../components/Button";
 import Modal from "../components/Modal";
-import Pagination from "../components/Pagination";
 
 import { useCallback } from "react";
 
@@ -18,19 +19,19 @@ function Category() {
   const [categoryTitle, setCategoryTitle] = useState("");
   const [categoryGroupId, setCategoryGroupId] = useState(1);
   const [categoryStatus, setCategoryStatus] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage] = useState(10);
+  const [pageNumber, setPageNumber] = useState(0);
 
   const handleAddClick = useCallback(() => {
     setCategoryStatus("add");
+    setCategoryGroupId(1);
     setOpenModal(true);
   }, []);
+
   const handleUpdateClick = (
     idParam,
     categoryTitleParam,
     categoryGroupIdParam
   ) => {
-    console.log(categoryTitle);
     setCategoryId(idParam);
     setCategoryTitle(categoryTitleParam);
     setCategoryGroupId(categoryGroupIdParam);
@@ -38,31 +39,31 @@ function Category() {
     setOpenModal(true);
   };
 
-  const handleCategoryChange = useCallback((e) => {
+  const handleCategoryChange = (e) => {
     setCategoryTitle(e.target.value);
-  }, []);
+  };
 
-  const handleSelectCategory = useCallback((e) => {
+  const handleSelectCategory = (e) => {
     setCategoryGroupId(e.target.value);
-  }, []);
+  };
 
-  const handleAddCategory = useCallback(async () => {
+  const handleAddCategory = async () => {
     await Axios.post("http://localhost:8080/category/create/", {
       categoryGroupId: categoryGroupId,
       categoryTitle: categoryTitle,
     });
     setReload(!reload);
     setCategoryTitle("");
-  }, [categoryTitle]);
+  };
 
-  const handleUpdateCategory = useCallback(async () => {
+  const handleUpdateCategory = async () => {
     await Axios.put("http://localhost:8080/category/update/" + categoryId, {
       categoryGroupId: categoryGroupId,
       categoryTitle: categoryTitle,
     });
     setReload(!reload);
     setCategoryTitle("");
-  }, [categoryTitle, categoryGroupId]);
+  };
 
   const handleDeleteCategory = async (id) => {
     await Axios.delete("http://localhost:8080/category/delete/" + id);
@@ -83,22 +84,15 @@ function Category() {
     });
   }, [reload]);
 
-  //paginate
-  useEffect(() => {
-    const fetchPosts = async () => {};
+  const usersPerPage = 10;
+  const pagesVisited = pageNumber * usersPerPage;
+  const pageCount = Math.ceil(category.length / usersPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
 
-    fetchPosts();
-  }, []);
-
-  // // Get current posts
-  // const indexOfLastPost = currentPage * postsPerPage;
-  // const indexOfFirstPost = indexOfLastPost - postsPerPage;
-
-  // // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  console.log(paginate);
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", position: "relative", minHeight: "670px" }}>
       {openModal && (
         <Modal
           closeModal={setOpenModal}
@@ -110,6 +104,7 @@ function Category() {
             name="pets"
             id="pet-select"
             onChange={handleSelectCategory}
+            value={categoryGroupId}
             style={{
               height: "37px",
               width: "100%",
@@ -123,7 +118,6 @@ function Category() {
               marginBottom: "10px",
             }}
           >
-            {/* <option value="">--Please choose an option--</option> */}
             {categoryGroup.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.category_group_title}
@@ -135,17 +129,6 @@ function Category() {
             value={categoryTitle}
             placeholder="Tên loại ..."
             onChange={handleCategoryChange}
-            style={{
-              height: "37px",
-              width: "calc(100% - 10px)",
-              borderRadius: "8px",
-              border: "1px solid #ced4da",
-              lineHeight: "1.5",
-              fontSize: "16px",
-              fontWeight: "400",
-              padding: "0 0 0 10px",
-              marginBottom: "10px",
-            }}
           />
           <div
             style={{
@@ -170,54 +153,78 @@ function Category() {
           <FaPlus color="#ffffff" fontSize="13px" />
           Thêm
         </Button>
-        <div className="catagory__table__container">
-          <table className="category__table">
+        <div className="table__container">
+          <table className="table">
             <thead>
               <tr>
-                <th>Id</th>
-                <th>Category Group</th>
-                <th>Category</th>
-                <th>Delete</th>
-                <th>Update</th>
+                <th style={{ width: "150px" }}>Id</th>
+                <th style={{ width: "350px" }}>Category Group</th>
+                <th style={{ width: "450px" }}>Category</th>
+                <th style={{ width: "130px" }}>Delete</th>
+                <th style={{ width: "130px" }}>Update</th>
               </tr>
             </thead>
             <tbody>
-              {category.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.id}</td>
-                  <td>{item.category_group_title}</td>
-                  <td>{item.category_title}</td>
-                  <td>
-                    <Button
-                      height={"30px"}
-                      width={"70px"}
-                      backgroundColor={"red"}
-                      onClick={() => handleDeleteCategory(item.id)}
-                    >
-                      Xoá
-                    </Button>
-                  </td>
-                  <td>
-                    <Button
-                      height={"30px"}
-                      width={"70px"}
-                      backgroundColor={"blue"}
-                      onClick={() =>
-                        handleUpdateClick(
-                          item.id,
-                          item.category_title,
-                          item.fk_category_group_id
-                        )
-                      }
-                    >
-                      Sửa
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {category
+                .slice(pagesVisited, pagesVisited + usersPerPage)
+                .map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td>{item.category_group_title}</td>
+                    <td>
+                      <div style={{ width: "450px" }}>
+                        {item.category_title}
+                      </div>
+                    </td>
+                    <td>
+                      <Button
+                        height={"30px"}
+                        width={"70px"}
+                        backgroundColor={"red"}
+                        onClick={() => handleDeleteCategory(item.id)}
+                      >
+                        Xoá
+                      </Button>
+                    </td>
+                    <td>
+                      <Button
+                        height={"30px"}
+                        width={"70px"}
+                        backgroundColor={"blue"}
+                        onClick={() =>
+                          handleUpdateClick(
+                            item.id,
+                            item.category_title,
+                            item.fk_category_group_id
+                          )
+                        }
+                      >
+                        Sửa
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
+        {category.length > 0 && (
+          <div
+            className="pagination"
+            style={{ position: "absolute", bottom: "0" }}
+          >
+            <ReactPaginate
+              previousLabel={"Previous"}
+              nextLabel={"Next"}
+              pageCount={pageCount}
+              onPageChange={changePage}
+              containerClassName={"pagination__btn"}
+              previousLinkClassName={"previousBttn"}
+              nextLinkClassName={"nextBttn"}
+              disabledClassName={"pagination--disabled"}
+              activeClassName={"pagination--active"}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

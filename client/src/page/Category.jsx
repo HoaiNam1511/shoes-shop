@@ -9,21 +9,25 @@ import Button from "../components/Button";
 import Modal from "../components/Modal";
 
 import { useCallback } from "react";
+import { useRef } from "react";
 
 function Category() {
   const [categoryGroup, setCategoryGroup] = useState([]);
   const [category, setCategory] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [reload, setReload] = useState(false);
-  const [categoryId, setCategoryId] = useState("");
   const [categoryTitle, setCategoryTitle] = useState("");
-  const [categoryGroupId, setCategoryGroupId] = useState(1);
-  const [categoryStatus, setCategoryStatus] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
 
+  const refCategoryStatus = useRef();
+  const refCategoryGroupId = useRef(1);
+  const refCategoryId = useRef();
+  const refModalTitle = useRef();
+
   const handleAddClick = useCallback(() => {
-    setCategoryStatus("add");
-    setCategoryGroupId(1);
+    refCategoryStatus.current = "add";
+    refModalTitle.current = "Thêm loại sản phẩm";
+    refCategoryGroupId.current = 1;
     setOpenModal(true);
   }, []);
 
@@ -32,10 +36,11 @@ function Category() {
     categoryTitleParam,
     categoryGroupIdParam
   ) => {
-    setCategoryId(idParam);
+    refCategoryId.current = idParam;
     setCategoryTitle(categoryTitleParam);
-    setCategoryGroupId(categoryGroupIdParam);
-    setCategoryStatus("update");
+    refCategoryGroupId.current = categoryGroupIdParam;
+    refModalTitle.current = "Sửa loại sản phẩm";
+    refCategoryStatus.current = "update";
     setOpenModal(true);
   };
 
@@ -44,12 +49,12 @@ function Category() {
   };
 
   const handleSelectCategory = (e) => {
-    setCategoryGroupId(e.target.value);
+    refCategoryGroupId.current = e.target.value;
   };
 
   const handleAddCategory = async () => {
     await Axios.post("http://localhost:8080/category/create/", {
-      categoryGroupId: categoryGroupId,
+      categoryGroupId: refCategoryGroupId.current,
       categoryTitle: categoryTitle,
     });
     setReload(!reload);
@@ -57,10 +62,13 @@ function Category() {
   };
 
   const handleUpdateCategory = async () => {
-    await Axios.put("http://localhost:8080/category/update/" + categoryId, {
-      categoryGroupId: categoryGroupId,
-      categoryTitle: categoryTitle,
-    });
+    await Axios.put(
+      "http://localhost:8080/category/update/" + refCategoryId.current,
+      {
+        categoryGroupId: refCategoryGroupId.current,
+        categoryTitle: categoryTitle,
+      }
+    );
     setReload(!reload);
     setCategoryTitle("");
   };
@@ -96,7 +104,7 @@ function Category() {
       {openModal && (
         <Modal
           closeModal={setOpenModal}
-          title="Thêm loại hàng"
+          title={refModalTitle.current}
           height={"200px"}
           width={"500px"}
         >
@@ -104,7 +112,7 @@ function Category() {
             name="pets"
             id="pet-select"
             onChange={handleSelectCategory}
-            value={categoryGroupId}
+            value={refCategoryGroupId.current}
             style={{
               height: "37px",
               width: "100%",
@@ -139,7 +147,7 @@ function Category() {
               alignItems: "flex-end",
             }}
           >
-            {categoryStatus === "add" ? (
+            {refCategoryStatus.current === "add" ? (
               <Button onClick={handleAddCategory}>Thêm</Button>
             ) : (
               <Button onClick={handleUpdateCategory}>Sửa</Button>

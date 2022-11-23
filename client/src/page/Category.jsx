@@ -8,69 +8,61 @@ import "../scss/_global.scss";
 import Button from "../components/Button";
 import Modal from "../components/Modal";
 
-import { useCallback } from "react";
-import { useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 function Category() {
   const [categoryGroup, setCategoryGroup] = useState([]);
-  const [category, setCategory] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [reload, setReload] = useState(false);
-  const [categoryTitle, setCategoryTitle] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
 
   const refCategoryStatus = useRef();
-  const refCategoryGroupId = useRef(1);
-  const refCategoryId = useRef();
   const refModalTitle = useRef();
+
+  const [category, setCategory] = useState({
+    categoryId: "",
+    categoryTitle: "",
+    categoryGroupId: 1,
+  });
+  const { categoryId, categoryTitle, categoryGroupId } = category;
 
   const handleAddClick = useCallback(() => {
     refCategoryStatus.current = "add";
     refModalTitle.current = "Thêm loại sản phẩm";
-    refCategoryGroupId.current = 1;
     setOpenModal(true);
   }, []);
 
-  const handleUpdateClick = (
-    idParam,
-    categoryTitleParam,
-    categoryGroupIdParam
-  ) => {
-    refCategoryId.current = idParam;
-    setCategoryTitle(categoryTitleParam);
-    refCategoryGroupId.current = categoryGroupIdParam;
+  const handleUpdateClick = (item) => {
+    setCategory({
+      categoryId: item.id,
+      categoryTitle: item.category_title,
+      categoryGroupId: item.fk_category_group_id,
+    });
     refModalTitle.current = "Sửa loại sản phẩm";
     refCategoryStatus.current = "update";
     setOpenModal(true);
   };
 
-  const handleCategoryChange = (e) => {
-    setCategoryTitle(e.target.value);
+  const handleChangeCategory = (e) => {
+    setCategory({ ...category, [e.target.name]: e.target.value });
   };
-
-  const handleSelectCategory = (e) => {
-    refCategoryGroupId.current = e.target.value;
-  };
-
   const handleAddCategory = async () => {
     await Axios.post("http://localhost:8080/category/create/", {
-      categoryGroupId: refCategoryGroupId.current,
+      categoryGroupId: categoryGroupId,
       categoryTitle: categoryTitle,
     });
+    setCategory({ ...category, categoryTitle: "" });
     setReload(!reload);
-    setCategoryTitle("");
   };
 
   const handleUpdateCategory = async () => {
-    await Axios.put(
-      "http://localhost:8080/category/update/" + refCategoryId.current,
-      {
-        categoryGroupId: refCategoryGroupId.current,
-        categoryTitle: categoryTitle,
-      }
-    );
+    await Axios.put("http://localhost:8080/category/update/" + categoryId, {
+      categoryGroupId: categoryGroupId,
+      categoryTitle: categoryTitle,
+    });
+    setCategory({ ...category, categoryTitle: "" });
     setReload(!reload);
-    setCategoryTitle("");
   };
 
   const handleDeleteCategory = async (id) => {
@@ -88,13 +80,13 @@ function Category() {
 
   useEffect(() => {
     Axios.get("http://localhost:8080/category/get/").then((res) => {
-      setCategory(res.data);
+      setCategoryData(res.data);
     });
   }, [reload]);
 
   const usersPerPage = 10;
   const pagesVisited = pageNumber * usersPerPage;
-  const pageCount = Math.ceil(category.length / usersPerPage);
+  const pageCount = Math.ceil(categoryData.length / usersPerPage);
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
@@ -109,22 +101,11 @@ function Category() {
           width={"500px"}
         >
           <select
-            name="pets"
+            name="categoryGroupId"
             id="pet-select"
-            onChange={handleSelectCategory}
-            value={refCategoryGroupId.current}
-            style={{
-              height: "37px",
-              width: "100%",
-              borderRadius: "8px",
-              border: "1px solid #ced4da",
-              lineHeight: "1.5",
-              fontSize: "16px",
-              fontWeight: "400",
-              outline: "none",
-              padding: "0 10px 0 10px",
-              marginBottom: "10px",
-            }}
+            onChange={handleChangeCategory}
+            value={categoryGroupId}
+            className="select"
           >
             {categoryGroup.map((item) => (
               <option key={item.id} value={item.id}>
@@ -134,9 +115,10 @@ function Category() {
           </select>
           <input
             type="text"
+            name="categoryTitle"
             value={categoryTitle}
             placeholder="Tên loại ..."
-            onChange={handleCategoryChange}
+            onChange={handleChangeCategory}
           />
           <div
             style={{
@@ -173,7 +155,7 @@ function Category() {
               </tr>
             </thead>
             <tbody>
-              {category
+              {categoryData
                 .slice(pagesVisited, pagesVisited + usersPerPage)
                 .map((item) => (
                   <tr key={item.id}>
@@ -199,13 +181,7 @@ function Category() {
                         height={"30px"}
                         width={"70px"}
                         backgroundColor={"blue"}
-                        onClick={() =>
-                          handleUpdateClick(
-                            item.id,
-                            item.category_title,
-                            item.fk_category_group_id
-                          )
-                        }
+                        onClick={() => handleUpdateClick(item)}
                       >
                         Sửa
                       </Button>
@@ -215,7 +191,8 @@ function Category() {
             </tbody>
           </table>
         </div>
-        {category.length > 0 && (
+
+        {categoryData.length > 0 && (
           <div
             className="pagination"
             style={{ position: "absolute", bottom: "0" }}

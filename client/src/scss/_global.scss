@@ -6,7 +6,7 @@
     border-collapse: collapse;
     margin-top: 10px;
     font-size: 16px;
-    //min-width: 1200px;
+    min-width: 1200px;
     border-radius: 5px 5px 0 0;
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
@@ -79,15 +79,21 @@ $paddingPagination: 6px;
         background-color: grey;
         border:0px solid
     }     
-//Input
-.input__submit {
+.select{
     height: 37px;
-    width: calc(100% - 20px);
-    border-radius : 8px;
+    width: 100%;
+    border-radius: 8px;
     border: 1px solid #ced4da;
     line-height: 1.5;
     font-size: 16px;
     font-weight: 400;
+    outline: none;
     padding: 0 10px 0 10px;
-    margin-bottom: 10px;                    
+    margin-bottom: 10px;            
 }
+
+.input__container__flex {
+
+}
+
+

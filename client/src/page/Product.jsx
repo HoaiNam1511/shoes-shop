@@ -1,27 +1,33 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Axios from "axios";
 import ReactPaginate from "react-paginate";
 import Modal from "../components/Modal";
 import Button from "../components/Button";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaUpload } from "react-icons/fa";
 import "../scss/_base.scss";
-import { useEffect } from "react";
-import { useRef } from "react";
+import "../scss/_global.scss";
+import "../scss/_product.scss";
+import axios from "axios";
+
 function Product() {
   const [openModal, setOpenModal] = useState(false);
   const [reload, setReload] = useState(false);
   const [pageNumber, setPageNumber] = useState(0);
-  const [categoryData, setCategoryData] = useState([]);
-  const [productData, setProductData] = useState([]);
+  const [categorys, setCategorys] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [images, setImages] = useState([]);
 
-  const buttonTitle = useRef();
+  const [categoryStatus, setCategoryStatus] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
+  const [formSelect, setFormSelect] = useState("form1");
+
   const productPerPage = 10;
   const pagesVisited = productPerPage * pageNumber;
   const changePage = (e) => {
     setPageNumber(e.target.value);
   };
-  const pageCount = Math.ceil(productData.length / productPerPage);
+  const pageCount = Math.ceil(products.length / productPerPage);
 
   const [product, setProduct] = useState({
     productId: "",
@@ -44,7 +50,8 @@ function Product() {
     categoryMaterialId,
   } = product;
   const handleAddClick = () => {
-    buttonTitle.current = "add";
+    setCategoryStatus("add");
+    setModalTitle("Thêm sản phẩm");
     setOpenModal(true);
   };
   const handleUpdateClick = (item) => {
@@ -58,26 +65,57 @@ function Product() {
       categoryCollectionId: item.fk_category_collection_id,
       categoryMaterialId: item.fk_category_material,
     });
+    setCategoryStatus("update");
+    setModalTitle("Sửa sản phẩm");
     setOpenModal(true);
   };
 
   const handleValueChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
   };
+
+  const handleChangeForm = (e) => {
+    setFormSelect(e.target.name);
+  };
   const handleAddProduct = async () => {
-    await Axios.post("http://localhost:8080/product/create/", {
-      productTitle: productTitle,
-      productPrice: productPrice,
-      categoryStatusId: categoryStatusId,
-      categoryStyleId: categoryStyleId,
-      categoryLineId: categoryLineId,
-      categoryCollectionId: categoryCollectionId,
-      categoryMaterialId: categoryMaterialId,
+    let productData = new FormData();
+    Array.from(images).forEach((image) => {
+      console.log(image);
+      productData.append("productImages", image);
     });
+    productData.append("productTitle", productTitle);
+    productData.append("productPrice", productPrice);
+    productData.append(
+      "categoryStatusId",
+      categoryStatusId !== "" ? categoryStatusId : initialCategoryId[0].id
+    );
+    productData.append(
+      "categoryStyleId",
+      categoryStyleId !== "" ? categoryStyleId : initialCategoryId[1].id
+    );
+    productData.append(
+      "categoryLineId",
+      categoryLineId !== "" ? categoryLineId : initialCategoryId[2].id
+    );
+    productData.append(
+      "categoryCollectionId",
+      categoryCollectionId !== ""
+        ? categoryCollectionId
+        : initialCategoryId[3].id
+    );
+    productData.append(
+      "categoryMaterialId",
+      categoryMaterialId !== "" ? categoryMaterialId : initialCategoryId[4].id
+    );
+
+    axios.post("http://localhost:8080/product/create/", productData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
     setReload(!reload);
   };
   const handleUpdateProduct = async () => {
-    await Axios.put("http://localhost:8080/product/update/" + productId, {
+    await Axios.put(`http://localhost:8080/product/update/${productId}`, {
       productTitle: productTitle,
       productPrice: productPrice,
       categoryStatusId: categoryStatusId,
@@ -89,7 +127,7 @@ function Product() {
     setReload(!reload);
   };
   const handleDeleteProduct = async (id) => {
-    await Axios.delete("http://localhost:8080/product/delete/" + id).then(
+    await Axios.delete(`http://localhost:8080/product/delete/${id}`).then(
       (res) => {
         if (res.data === "success") {
           setReload(!reload);
@@ -97,111 +135,162 @@ function Product() {
       }
     );
   };
-
   useEffect(() => {
     Axios.get("http://localhost:8080/category/get/").then((res) => {
-      setCategoryData(res.data);
+      setCategorys(res.data);
     });
   }, []);
 
   useEffect(() => {
     Axios.get("http://localhost:8080/product/get/").then((res) => {
-      setProductData(res.data);
+      setProducts(res.data);
     });
   }, [reload]);
+
+  const initialCategoryId = categorys.filter(
+    (data, index, self) =>
+      index ===
+      self.findIndex(
+        (i) => i.fk_category_group_id === data.fk_category_group_id
+      )
+  );
+
+  const handleUploadFile = (e) => {
+    setImages(e.target.files);
+  };
+
+  const handleDeleteImage = (index) => {
+    //Xem lai phan nay
+    let fileArr = Array.from(images);
+    fileArr.splice(index, 1);
+    setImages(fileArr);
+  };
+
   return (
     <div style={{ display: "flex", position: "relative", minHeight: "670px" }}>
       {openModal && (
         <Modal
+          title={modalTitle}
           closeModal={setOpenModal}
-          title="Thêm sản phẩm"
           height={"520px"}
-          width={"500px"}
+          width={"400px"}
         >
-          <div>
-            <label>Product Name</label>
-            <input
-              type="text"
-              placeholder="Product Title ..."
-              name="productTitle"
-              onChange={handleValueChange}
-              value={productTitle}
-            />
-          </div>
-          <div>
-            <label>Price</label>
-            <input
-              type="text"
-              placeholder="Product Title ..."
-              name="productPrice"
-              onChange={handleValueChange}
-              value={productPrice}
-            />
-          </div>
-          <div>
-            <label>Status</label>
-            <select
-              name="categoryStatusId"
-              onChange={handleValueChange}
-              value={categoryStatusId}
-              className="select"
+          <div className="modal__selection">
+            <button
+              className={`modal__selection__btn ${
+                formSelect === "form1" ? "modal__selection--active" : ""
+              }`}
+              name="form1"
+              onClick={handleChangeForm}
             >
-              {categoryData.map(
-                (item) =>
-                  item.fk_category_group_id === 1 && (
-                    <option value={item.id}>{item.category_title}</option>
-                  )
-              )}
-            </select>
-          </div>
-          <div>
-            <label>Style</label>
-            <select
-              name="categoryStyleId"
-              onChange={handleValueChange}
-              value={categoryStyleId}
-              className="select"
+              Thông tin
+            </button>
+            <button
+              className={`modal__selection__btn ${
+                formSelect === "form2" ? "modal__selection--active" : ""
+              }`}
+              name="form2"
+              onClick={handleChangeForm}
             >
-              {categoryData.map(
-                (item) =>
-                  item.fk_category_group_id === 2 && (
-                    <option value={item.id}>{item.category_title}</option>
-                  )
-              )}
-            </select>
+              Hình ảnh
+            </button>
           </div>
-          <div>
-            <label>Category Line</label>
-            <select
-              name="categoryLineId"
-              onChange={handleValueChange}
-              value={categoryLineId}
-              className="select"
-            >
-              {categoryData.map(
-                (item) =>
-                  item.fk_category_group_id === 3 && (
-                    <option value={item.id}>{item.category_title}</option>
-                  )
-              )}
-            </select>
-          </div>
-          <div>
+          {/* form1 */}
+          <div
+            className={`modal__form ${
+              formSelect === "form1" ? "modal__form--active" : ""
+            }`}
+          >
             <div>
-              <label>Colection</label>
-              <select
-                name="categoryCollectionId"
+              <label>Product Name</label>
+              <input
+                className="input__text"
+                type="text"
+                placeholder="Product Title ..."
+                name="productTitle"
                 onChange={handleValueChange}
-                value={categoryCollectionId}
-                className="select"
-              >
-                {categoryData.map(
-                  (item) =>
-                    item.fk_category_group_id === 4 && (
-                      <option value={item.id}>{item.category_title}</option>
-                    )
-                )}
-              </select>
+                value={productTitle}
+              />
+            </div>
+            <div>
+              <label>Price</label>
+              <input
+                className="input__text"
+                type="text"
+                placeholder="Product Title ..."
+                name="productPrice"
+                onChange={handleValueChange}
+                value={productPrice}
+              />
+            </div>
+            <div className="flex__container">
+              <div className="flex__container__child">
+                <label>Status</label>
+                <select
+                  name="categoryStatusId"
+                  onChange={handleValueChange}
+                  value={categoryStatusId}
+                  className="select"
+                >
+                  {categorys.map(
+                    (item) =>
+                      item.fk_category_group_id === 1 && (
+                        <option value={item.id}>{item.category_title}</option>
+                      )
+                  )}
+                </select>
+              </div>
+              <div className="flex__container__child">
+                <label>Style</label>
+                <select
+                  name="categoryStyleId"
+                  onChange={handleValueChange}
+                  value={categoryStyleId}
+                  className="select"
+                >
+                  {categorys.map(
+                    (item) =>
+                      item.fk_category_group_id === 2 && (
+                        <option value={item.id}>{item.category_title}</option>
+                      )
+                  )}
+                </select>
+              </div>
+            </div>
+            <div className="flex__container">
+              <div className="flex__container__child">
+                <label>Category Line</label>
+                <select
+                  name="categoryLineId"
+                  onChange={handleValueChange}
+                  value={categoryLineId}
+                  className="select"
+                >
+                  {categorys.map(
+                    (item) =>
+                      item.fk_category_group_id === 3 && (
+                        <option value={item.id}>{item.category_title}</option>
+                      )
+                  )}
+                </select>
+              </div>
+
+              <div className="flex__container__child">
+                <label>Colection</label>
+                <select
+                  name="categoryCollectionId"
+                  onChange={handleValueChange}
+                  value={categoryCollectionId}
+                  className="select"
+                >
+                  {categorys.map(
+                    (item) =>
+                      item.fk_category_group_id === 4 && (
+                        <option value={item.id}>{item.category_title}</option>
+                      )
+                  )}
+                </select>
+              </div>
             </div>
             <div>
               <label>Material</label>
@@ -211,7 +300,7 @@ function Product() {
                 value={categoryMaterialId}
                 className="select"
               >
-                {categoryData.map(
+                {categorys.map(
                   (item) =>
                     item.fk_category_group_id === 5 && (
                       <option value={item.id}>{item.category_title}</option>
@@ -219,7 +308,53 @@ function Product() {
                 )}
               </select>
             </div>
-            {buttonTitle.current === "add" ? (
+          </div>
+          {/* form2 */}
+          <div
+            className={`modal__form ${
+              formSelect === "form2" ? "modal__form--active" : ""
+            }`}
+          >
+            <input
+              style={{ display: "none" }}
+              id="file-upload"
+              type="file"
+              onChange={handleUploadFile}
+              multiple="multiple"
+            />
+            <label htmlFor="file-upload" className="modal__form__upload">
+              <FaUpload className="modal__form__upload__icon"></FaUpload>
+              <div className="modal__form__upload__title">
+                Select a file or drang here
+              </div>
+            </label>
+            <div className="modal__form__image">
+              {Array.from(images).map((item, index) => (
+                <div className="product__container">
+                  <button
+                    className="product__image__btn"
+                    onClick={() => handleDeleteImage(index)}
+                  >
+                    x
+                  </button>
+                  <img
+                    key={index}
+                    className="product__image"
+                    src={item ? URL.createObjectURL(item) : null}
+                    alt=""
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "25px",
+            }}
+          >
+            {categoryStatus === "add" ? (
               <Button onClick={handleAddProduct}>Thêm</Button>
             ) : (
               <Button onClick={handleUpdateProduct}>Sửa</Button>
@@ -247,17 +382,17 @@ function Product() {
               </tr>
             </thead>
             <tbody>
-              {productData
+              {products
                 .slice(pagesVisited, pagesVisited + productPerPage)
-                .map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.id}</td>
-                    <td>{item.product_code}</td>
+                .map((product) => (
+                  <tr key={product.id}>
+                    <td>{product.id}</td>
+                    <td>{product.product_code}</td>
                     <td>
-                      <div>{item.product_title}</div>
+                      <div>{product.product_title}</div>
                     </td>
                     <td>
-                      <div>{item.product_price}</div>
+                      <div>{product.product_price}</div>
                     </td>
                     <td>
                       <Button
@@ -273,7 +408,7 @@ function Product() {
                         height={"30px"}
                         width={"70px"}
                         backgroundColor={"red"}
-                        onClick={() => handleDeleteProduct(item.id)}
+                        onClick={() => handleDeleteProduct(product.id)}
                       >
                         Xoá
                       </Button>
@@ -283,7 +418,7 @@ function Product() {
                         height={"30px"}
                         width={"70px"}
                         backgroundColor={"blue"}
-                        onClick={() => handleUpdateClick(item)}
+                        onClick={() => handleUpdateClick(product)}
                       >
                         Sửa
                       </Button>
@@ -294,7 +429,7 @@ function Product() {
           </table>
         </div>
       </div>
-      {productData.length > 0 && (
+      {products.length > 0 && (
         <div
           className="pagination"
           style={{ position: "absolute", bottom: "0" }}

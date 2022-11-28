@@ -4,13 +4,12 @@ import { memo } from "react";
 function Modal({ closeModal, children, title, height, width }) {
   console.log("Load Modal");
   return (
-    <div className="modalBackground">
+    <div className="modal__background">
       <div
-        className="modalContainer"
+        className="modal__container"
         style={{
           height: `${height !== undefined ? height : "520px"}`,
           width: `${width !== undefined ? width : "500px"}`,
-          padding: "25px",
         }}
       >
         <div className="modal__header">

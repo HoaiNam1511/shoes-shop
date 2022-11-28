@@ -1,24 +1,20 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Axios from "axios";
 import ReactPaginate from "react-paginate";
-import { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
 import "../scss/_category.scss";
 import "../scss/_global.scss";
 import Button from "../components/Button";
 import Modal from "../components/Modal";
 
-import { useCallback, useMemo, useRef } from "react";
-
 function Category() {
-  const [categoryGroup, setCategoryGroup] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
+  const [categoryGroups, setCategoryGroups] = useState([]);
+  const [categorys, setCategorys] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [reload, setReload] = useState(false);
   const [pageNumber, setPageNumber] = useState(0);
-
-  const refCategoryStatus = useRef();
-  const refModalTitle = useRef();
+  const [categoryStatus, setCategoryStatus] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
 
   const [category, setCategory] = useState({
     categoryId: "",
@@ -28,8 +24,8 @@ function Category() {
   const { categoryId, categoryTitle, categoryGroupId } = category;
 
   const handleAddClick = useCallback(() => {
-    refCategoryStatus.current = "add";
-    refModalTitle.current = "Thêm loại sản phẩm";
+    setCategoryStatus("add");
+    setModalTitle("Thêm loại sản phẩm");
     setOpenModal(true);
   }, []);
 
@@ -39,8 +35,8 @@ function Category() {
       categoryTitle: item.category_title,
       categoryGroupId: item.fk_category_group_id,
     });
-    refModalTitle.current = "Sửa loại sản phẩm";
-    refCategoryStatus.current = "update";
+    setCategoryStatus("update");
+    setModalTitle("Sửa loại sản phẩm");
     setOpenModal(true);
   };
 
@@ -57,7 +53,7 @@ function Category() {
   };
 
   const handleUpdateCategory = async () => {
-    await Axios.put("http://localhost:8080/category/update/" + categoryId, {
+    await Axios.put(`http://localhost:8080/category/update/${categoryId}`, {
       categoryGroupId: categoryGroupId,
       categoryTitle: categoryTitle,
     });
@@ -66,27 +62,27 @@ function Category() {
   };
 
   const handleDeleteCategory = async (id) => {
-    await Axios.delete("http://localhost:8080/category/delete/" + id);
+    await Axios.delete(`http://localhost:8080/category/delete/${id}`);
     setReload(!reload);
   };
 
   useEffect(() => {
     Axios.get("http://localhost:8080/category/getAllCategoryGroup/").then(
       (res) => {
-        setCategoryGroup(res.data);
+        setCategoryGroups(res.data);
       }
     );
   }, []);
 
   useEffect(() => {
     Axios.get("http://localhost:8080/category/get/").then((res) => {
-      setCategoryData(res.data);
+      setCategorys(res.data);
     });
   }, [reload]);
 
   const usersPerPage = 10;
   const pagesVisited = pageNumber * usersPerPage;
-  const pageCount = Math.ceil(categoryData.length / usersPerPage);
+  const pageCount = Math.ceil(categorys.length / usersPerPage);
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
@@ -96,7 +92,7 @@ function Category() {
       {openModal && (
         <Modal
           closeModal={setOpenModal}
-          title={refModalTitle.current}
+          title={modalTitle}
           height={"200px"}
           width={"500px"}
         >
@@ -107,13 +103,14 @@ function Category() {
             value={categoryGroupId}
             className="select"
           >
-            {categoryGroup.map((item) => (
+            {categoryGroups.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.category_group_title}
               </option>
             ))}
           </select>
           <input
+            className="input__text"
             type="text"
             name="categoryTitle"
             value={categoryTitle}
@@ -122,14 +119,12 @@ function Category() {
           />
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              height: "50%",
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
+              position: "absolute",
+              bottom: "20px",
+              right: "25px",
             }}
           >
-            {refCategoryStatus.current === "add" ? (
+            {categoryStatus === "add" ? (
               <Button onClick={handleAddCategory}>Thêm</Button>
             ) : (
               <Button onClick={handleUpdateCategory}>Sửa</Button>
@@ -155,7 +150,7 @@ function Category() {
               </tr>
             </thead>
             <tbody>
-              {categoryData
+              {categorys
                 .slice(pagesVisited, pagesVisited + usersPerPage)
                 .map((item) => (
                   <tr key={item.id}>
@@ -192,7 +187,7 @@ function Category() {
           </table>
         </div>
 
-        {categoryData.length > 0 && (
+        {categorys.length > 0 && (
           <div
             className="pagination"
             style={{ position: "absolute", bottom: "0" }}
@@ -203,8 +198,8 @@ function Category() {
               pageCount={pageCount}
               onPageChange={changePage}
               containerClassName={"pagination__btn"}
-              previousLinkClassName={"previousBttn"}
-              nextLinkClassName={"nextBttn"}
+              previousLinkClassName={"previous__btn"}
+              nextLinkClassName={"next__btn"}
               disabledClassName={"pagination--disabled"}
               activeClassName={"pagination--active"}
             />

@@ -1,3 +1,22 @@
+//input
+.input__text {
+    height: 37px;
+    width: calc(100% - 20px);
+    border-radius : 8px;
+    border: 1px solid #ced4da;
+    line-height: 1.5;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 0 10px 0 10px;
+    margin-bottom: 10px;  
+    &:focus {
+        border-color: rgba(221, 221, 221, 0.8);
+        box-shadow: 0 1px 1px rgba(206, 206, 206, 0.075) inset, 0 0 8px rgba(221, 221, 221, 0.8);
+        outline: 0 none;
+    }                 
+}
+
+
 //Table
 .table__container {
 
@@ -95,5 +114,13 @@ $paddingPagination: 6px;
 .input__container__flex {
 
 }
+.flex__container {
+    display: flex;
+    justify-content: space-between;
+    &__child {
+        width: 49%;
+    }
+}
+
 
 

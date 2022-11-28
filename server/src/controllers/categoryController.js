@@ -2,7 +2,7 @@ const connectionDB = require("../config/connectDB");
 
 class categoryController {
   getALLCategoryGroup(req, res) {
-    connectionDB.query("SELECT * FROM category_group", (err, result) => {
+    connectionDB.query("SELECT * FROM category_groups", (err, result) => {
       if (err) {
         console.log(err);
       } else {
@@ -13,7 +13,7 @@ class categoryController {
 
   getAllCategory(req, res) {
     connectionDB.query(
-      "SELECT cc.id, cc.category_title, cc.fk_category_group_id, pcg.category_group_title FROM category as cc JOIN category_group as pcg ON cc.fk_category_group_id = pcg.id ORDER BY cc.fk_category_group_id ASC",
+      "SELECT cc.id, cc.category_title, cc.fk_category_group_id, pcg.category_group_title FROM categorys as cc JOIN category_groups as pcg ON cc.fk_category_group_id = pcg.id ORDER BY cc.fk_category_group_id ASC, id",
       (err, result) => {
         if (err) {
           console.log(err);
@@ -26,7 +26,7 @@ class categoryController {
   createCategory(req, res) {
     const { categoryTitle, categoryGroupId } = req.body;
     connectionDB.query(
-      "INSERT INTO category(fk_category_group_id, category_title) VALUES(?, ?)",
+      "INSERT INTO categorys(fk_category_group_id, category_title) VALUES(?, ?)",
       [categoryGroupId, categoryTitle],
       (err, result) => {
         if (err) {
@@ -40,7 +40,7 @@ class categoryController {
   deleteCategory(req, res) {
     const id = req.params.id;
     connectionDB.query(
-      "DELETE from category WHERE id = ? ",
+      "DELETE from categorys WHERE id = ? ",
       [id],
       (err, result) => {
         if (err) {
@@ -57,7 +57,7 @@ class categoryController {
     const id = req.params.id;
 
     connectionDB.query(
-      "UPDATE category SET category_title = ?, fk_category_group_id= ? WHERE id = ? ",
+      "UPDATE categorys SET category_title = ?, fk_category_group_id= ? WHERE id = ? ",
       [categoryTitle, categoryGroupId, id],
       (err, result) => {
         if (err) {

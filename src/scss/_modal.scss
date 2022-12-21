@@ -1,0 +1,66 @@
+.modal__background {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0,0.2);
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+  }
+  .modal__container {
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 25px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+   
+    position: relative;
+  }
+  .modal--open {
+    animation: modalShow 0.4s ease;
+  }
+  .modal--close {
+    animation: modalHide 0.4s ease;
+  }
+ .modal__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  &__button {
+    height: 25px;
+    width: 25px;
+    border-radius: 100%;
+    border: 0px solid;
+  }
+  h2 {
+    font-size: 28px;
+    font-weight: 400;
+  }
+ }
+
+  @keyframes modalShow {
+    from {
+      top:-200px;
+      opacity: 0;
+    }
+    to {
+      top: 0px;
+      opacity: 1;
+    }
+  }
+
+  @keyframes modalHide {
+    from {
+      top: 0px;
+      opacity: 1;
+    }
+    to {
+   
+      top:-200px;
+      opacity: 0;
+    }
+  }

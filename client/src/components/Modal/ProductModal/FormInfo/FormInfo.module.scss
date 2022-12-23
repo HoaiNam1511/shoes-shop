@@ -1,0 +1,39 @@
+$border: 1px solid rgb(216, 216, 216);
+.wrapper {
+
+    .flex-2 {
+        display: flex;
+        margin: 0 -4px 0 -4px;
+        .flex-item {
+            flex: 1;
+            padding: 0 4px 0 4px;
+        }
+    } 
+    .form-group {
+        margin-top: 6px;
+        .input-label, .form-input {
+            color: #161823;
+        }
+    
+        .input-label {
+            display: block;
+            font-size: 1.4rem;
+        }
+        .form-input, .select {
+            height: 35px;
+            width: 100%;
+            font-size: 1.6rem;
+            padding: 0 10px;
+            border-radius: 4px;
+            border: $border;
+            outline: none; 
+        }
+        .form-input {
+    
+        }
+        .select {
+           
+        } 
+    }
+    
+}

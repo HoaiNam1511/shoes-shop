@@ -1,28 +1,36 @@
-import "./App.css";
-import { Route, Routes } from "react-router-dom";
-import HomePage from "./page/HomePage";
-import Category from "./page/Category";
-import Product from "./page/Product";
-import Sidebar from "./components/Sidebar";
-
+import MainLayout from "./layout/MainLayout/MainLayout";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Fragment } from "react";
+import Product from "./page/Product/Product";
+import router from "./router";
 function App() {
-  return (
-    <div style={{ display: "flex", flexDirection: "" }}>
-      <Sidebar></Sidebar>
-      <div style={{ height: "50px", width: "100%" }}>
-        <div
-          style={{ height: "50px", width: "auto", backgroundColor: "#fbfbfb" }}
-        ></div>
-        <div style={{ margin: "10px" }}>
-          <Routes>
-            <Route path="/" element={<HomePage></HomePage>}></Route>
-            <Route path="/category" element={<Category></Category>}></Route>
-            <Route path="/product" element={<Product></Product>}></Route>
-          </Routes>
-        </div>
-      </div>
-    </div>
-  );
+    return (
+        <Router>
+            <Routes>
+                {router.map((route, index) => {
+                    let Layout = MainLayout;
+
+                    // if (route.layout === null) {
+                    //   Layout = Fragment;
+                    // } else if (route.layout) {
+                    //   Layout = route.layout;
+                    // }
+                    let Page = route.component;
+                    return (
+                        <Route
+                            key={index}
+                            path={route.path}
+                            element={
+                                <Layout>
+                                    <Page></Page>
+                                </Layout>
+                            }
+                        ></Route>
+                    );
+                })}
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

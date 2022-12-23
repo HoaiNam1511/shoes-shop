@@ -1,0 +1,20 @@
+.action-btn {
+    background-color: transparent;
+    padding: 4px;
+    border:  transparent;
+    &:hover {
+        cursor: pointer;
+    }
+    .action-icon {
+        font-size: 2.2rem;
+    }
+    .update {
+        color:  #2196F3;
+    }
+    .delete {
+        color: #F44336;
+    }
+}
+.action-btn + .action-btn  {
+    margin-left: 10px;
+}

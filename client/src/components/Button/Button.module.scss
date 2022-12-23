@@ -1,0 +1,30 @@
+$primary: #2f4050;
+.button, .outLine {
+    width: 95px;
+    height: 35px;
+    background-color: #2f4050;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    &:hover {
+        cursor: pointer;
+    }
+    .wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .icon, .title {
+            display: flex;
+            align-items: center;
+        }
+        .icon + .title, .title + .icon {
+            margin-left: 8px;
+        }
+    }
+}
+.outLine {
+    border: 2px solid #2f4050;
+    background-color: #fff;
+    color: #161823;
+}

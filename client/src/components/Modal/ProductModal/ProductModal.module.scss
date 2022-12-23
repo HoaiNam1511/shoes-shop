@@ -1,0 +1,47 @@
+.wrapper {
+    width: 385px;
+    height: 477px;
+    .content {
+        height: 423px;
+        .tab {
+            display: flex;
+            height: 35px;
+            justify-content: center;
+            border: none solid #333;
+            // border-radius: 4px;
+            overflow: hidden;
+            .tab-btn {
+                flex: 1;
+                border: solid transparent;
+                background-color: transparent;
+                font-size: 1.6rem;
+                font-weight: 600;
+                color: #2f4050;
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+            .btn-active {
+               // $primary: #2f4050;
+               border-bottom: 4px solid  #2f4050;
+            }
+        }
+    }
+}
+.btn-container {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    // display: flex;
+    // justify-content: flex-end;
+    // margin-top: 10px;
+
+    .modal-btn {
+    }
+}
+.form-show {
+    display: block;
+}
+.form-hide {
+    display: none;
+}

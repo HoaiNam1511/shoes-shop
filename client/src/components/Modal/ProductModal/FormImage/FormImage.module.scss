@@ -1,0 +1,53 @@
+.wrapper {
+  
+    .upload {
+        display: none;
+    }
+    .upload-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid #5f6982;  
+        border-radius: 4px;
+        padding: 15px 10px;
+        margin-top: 6px;
+        cursor: pointer;
+        .upload-icon, .upload-title {
+            color: #5f6982;   
+        }
+        .upload-icon {
+            font-size: 4rem;
+        }
+        .upload-title {
+        
+        } 
+    }
+    .image-container {
+        margin: 5px -2px;
+        height: 242px;
+        overflow-y: auto;
+        .image-item {
+            position: relative;
+            width: 121px;
+            display: inline-block;
+            .btn-delete {
+                position: absolute;
+                right: 5px;
+                top: 2px;
+                width: 20px;
+                height: 20px;
+                border: 0px solid #fff;
+                border-radius: 100%;
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+            .image {
+                padding: 0 2px;
+                width: 100%;
+            }
+        }
+       
+    }
+    
+}

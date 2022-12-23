@@ -1,140 +1,191 @@
-const connectDB = require("../config/connectDB");
 const multer = require("multer");
 const path = require("path");
+const Product = require("../models/products");
+const Product_image = require("../models/product_images");
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "images");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+    destination: function (req, file, cb) {
+        cb(null, "images");
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname));
+    },
 });
-
-class productController {
-  createProduct(req, res) {
-    let upload = multer({ storage: storage }).array("productImages", 12);
-    upload(req, res, function (err) {
-      if (err instanceof multer.MulterError) {
-        // Một lỗi của Multer xảy ra khi upload.
-      } else if (err) {
-        // Một lỗi không xác định xảy ra khi upload.
-      } else {
+const upload = multer({ storage: storage }).array("productImages", 12);
+const createProduct = async (req, res) => {
+    upload(req, res, async function () {
+        // if (err instanceof multer.MulterError) {
+        //   // Một lỗi của Multer xảy ra khi upload.
+        // } else if (err) {
+        //   // Một lỗi không xác định xảy ra khi upload.
+        // } else {
+        // }
         const imageArray = req.files;
+
         const {
-          productTitle,
-          productPrice,
-          categoryStatusId,
-          categoryStyleId,
-          categoryLineId,
-          categoryCollectionId,
-          categoryMaterialId,
-        } = req.body;
-        connectDB.query(
-          "INSERT INTO products(product_title,product_price,fk_category_status_id,fk_category_style_id,fk_category_line_id,fk_category_collection_id,fk_category_material_id) VALUES(?,?,?,?,?,?,?)",
-          [
-            productTitle,
+            productName,
             productPrice,
             categoryStatusId,
             categoryStyleId,
             categoryLineId,
             categoryCollectionId,
             categoryMaterialId,
-          ],
-          (err, result) => {
-            if (err) {
-              console.log(err);
-            } else {
-              connectDB.query(
-                "SELECT id FROM products ORDER BY id DESC LIMIT 1",
-                [],
-                (err, result) => {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                    const insert_data = imageArray.reduce(
-                      (accumulator, currentValue) => [
-                        ...accumulator,
-                        [result[0].id, currentValue.filename],
-                      ],
-                      []
-                    );
-                    connectDB.query(
-                      "INSERT INTO product_images(fk_product_id,image) VALUES ?",
-                      [insert_data],
-                      (err, result) => {
-                        if (err) {
-                          console.log(err);
-                        } else {
-                          console.log("success");
-                        }
-                      }
-                    );
-                  }
-                }
-              );
+        } = req.body;
+
+        await Product.create({
+            product_code: "",
+            product_title: productName,
+            product_price: productPrice,
+            fk_category_status_id: categoryStatusId,
+            fk_category_style_id: categoryStyleId,
+            fk_category_line_id: categoryLineId,
+            fk_category_collection_id: categoryCollectionId,
+            fk_category_material_id: categoryMaterialId,
+        })
+            .then((result) => {
+                console.log("success");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+        const productId = await Product.findOne({
+            attributes: ["id"],
+            order: [["id", "DESC"]],
+        })
+            .then((productId) => {
+                return productId.id;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        //Cach 1
+        const newArrayImg = imageArray.map((item) => ({
+            fk_product_id: productId,
+            image: item.filename,
+        }));
+
+        //Cach 2
+        // const insert_data = imageArray.reduce(
+        //   (accumulator, currentValue) => [
+        //     ...accumulator,
+        //     { image: currentValue.filename },
+        //   ],
+        //   []
+        // );
+        await Product_image.bulkCreate(newArrayImg)
+            .then((product) => {
+                res.send("success");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    });
+};
+
+const getAllProduct = async (req, res) => {
+    await Product.findAll({
+        attributes: [
+            "id",
+            "product_code",
+            "product_title",
+            "product_price",
+            "fk_category_status_id",
+            "fk_category_style_id",
+            "fk_category_line_id",
+            "fk_category_collection_id",
+            "fk_category_material_id",
+        ],
+        include: [{ model: Product_image }],
+        order: [["id", "DESC"]],
+    })
+        .then((products) => {
+            res.send(products);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+};
+const updateProduct = async (req, res) => {
+    upload(req, res, async function () {
+        const { id } = req.params;
+
+        const {
+            productName,
+            productPrice,
+            categoryStatusId,
+            categoryStyleId,
+            categoryLineId,
+            categoryCollectionId,
+            categoryMaterialId,
+        } = req.body;
+
+        const imageFilesArray = req.files;
+        const imageFilesArr = imageFilesArray.map((item) => ({
+            fk_product_id: id,
+            image: item.filename,
+        }));
+        const imageArray = JSON.parse(req.body.images);
+
+        const imagesArr = imageArray.map((item) => ({
+            fk_product_id: id,
+            image: item.image,
+        }));
+
+        const newArrayImg = [...imagesArr, ...imageFilesArr];
+
+        await Product.update(
+            {
+                product_title: productName,
+                product_price: productPrice,
+                fk_category_status_id: categoryStatusId,
+                fk_category_style_id: categoryStyleId,
+                fk_category_line_id: categoryLineId,
+                fk_category_collection_id: categoryCollectionId,
+                fk_category_material_id: categoryMaterialId,
+            },
+            {
+                where: {
+                    id: id,
+                },
             }
-          }
-        );
-        console.log("aaaa");
-      }
+        )
+            .then((products) => {
+                console.log("updated");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        await Product_image.destroy({
+            where: {
+                fk_product_id: id,
+            },
+        });
+        await Product_image.bulkCreate(newArrayImg)
+            .then((product) => {
+                res.send("success");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     });
-  }
-
-  getAllProduct(req, res) {
-    let sql =
-      "SELECT prd.id,prd.product_code,prd.product_title,prd.product_price,prd.fk_category_status_id,prd.fk_category_style_id,prd.fk_category_line_id,prd.fk_category_collection_id,prd.fk_category_material_id FROM products as prd JOIN";
-    connectDB.query("Select * from products", [], (err, result) => {
-      if (err) {
-        res.send(err);
-      } else {
-        res.send(result);
-      }
-    });
-  }
-
-  deleteProduct(req, res) {
+};
+const deleteProduct = async (req, res) => {
     const { id } = req.params;
-    connectDB.query("DELETE FROM products WHERE id=?", [id], (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.send("success");
-      }
-    });
-  }
+    await Product.destroy({
+        where: {
+            id: id,
+        },
+    })
+        .then(() => res.send("success"))
+        .catch((error) => {
+            console.log(error);
+        });
+};
 
-  updateProduct(req, res) {
-    const { id } = req.params;
-    const {
-      productTitle,
-      productPrice,
-      categoryStatusId,
-      categoryStyleId,
-      categoryLineId,
-      categoryCollectionId,
-      categoryMaterialId,
-    } = req.body;
-    connectDB.query(
-      "UPDATE products SET product_title = ?,product_price = ?,fk_category_status_id = ?,fk_category_style_id = ?,fk_category_line_id = ?,fk_category_collection_id = ?,fk_category_material_id = ? WHERE id=?",
-      [
-        productTitle,
-        productPrice,
-        categoryStatusId,
-        categoryStyleId,
-        categoryLineId,
-        categoryCollectionId,
-        categoryMaterialId,
-        id,
-      ],
-      (err, result) => {
-        if (err) {
-          console.log(err);
-        } else {
-          res.send("Value Update");
-        }
-      }
-    );
-  }
-}
-module.exports = new productController();
+module.exports = {
+    createProduct,
+    getAllProduct,
+    deleteProduct,
+    updateProduct,
+};

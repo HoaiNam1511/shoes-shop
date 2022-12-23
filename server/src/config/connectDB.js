@@ -1,24 +1,21 @@
-var mysql = require("mysql");
+const { Sequelize } = require("sequelize");
 
-var connection = mysql.createConnection({
+const db = new Sequelize("shoes_shop", "root", null, {
   host: "localhost",
-  user: "root",
-  password: "",
-  database: "shoesshop",
+  dialect: "mysql",
+  //An query
+  define: {
+    timestamps: false,
+  },
+  logging: false,
 });
-
-// var dbconnection = mysql.createPool(pool);
-
-// // Attempt to catch disconnects
-// dbconnection.on("connection", function (connection) {
-//   console.log("DB Connection established");
-
-//   connection.on("error", function (err) {
-//     console.error(new Date(), "MySQL error", err.code);
-//   });
-//   connection.on("close", function (err) {
-//     console.error(new Date(), "MySQL close", err);
-//   });
-// });
-
-module.exports = connection;
+let connectDB = async () => {
+  try {
+    await db.authenticate();
+    console.log("Connection has been established successfully.");
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  }
+};
+connectDB();
+module.exports = db;

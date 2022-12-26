@@ -1,0 +1,56 @@
+$border: 1px solid rgb(216, 216, 216);
+.wrapper {
+    .form-group {
+        height: 60px;
+        .input-label, .form-input {
+            color: #161823;
+        }
+    
+        .input-label {
+            display: block;
+            font-size: 1.4rem;
+        }
+        .form-input, .select {
+            height: 35px;
+            width: 100%;
+            font-size: 1.6rem;
+            padding: 0 10px;
+            border-radius: 4px;
+            border: $border;
+            outline: none; 
+        }
+        .form-input {
+    
+        }
+        .select {
+           
+        } 
+        .radio-container {
+            display: flex;
+            justify-content: space-evenly;
+            .radio-item {
+                display: flex;
+                input[type="radio"] {
+                    -ms-transform: scale(1); /* IE 9 */
+                    -webkit-transform: scale(1); /* Chrome, Safari, Opera */
+                    transform: scale(1);
+                    line-height: 100%;
+                }
+                .radio-label {
+                    margin-left: 8px;
+                }
+            }
+        }
+        // &:first-child {
+        //     margin-top: 10px;
+        // }
+    }
+    .flex-2 {
+        display: flex;
+        margin: 0 -4px 0 -4px;
+        .flex-item {
+            flex: 1;
+            padding: 0 4px 0 4px;
+        }
+    } 
+}

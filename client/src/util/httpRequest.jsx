@@ -13,13 +13,12 @@ export const postRequest = async (path, option = {}) => {
     return response;
 };
 
-export const deleteRequest = async (path, option = {}) => {
-    const response = await httpRequest.delete(path, option);
+export const putRequest = async (path, option = {}) => {
+    const response = await httpRequest.put(path, option);
     return response;
 };
-export const putRequest = async (path, option = {}) => {
-    console.log(path);
-    const response = await httpRequest.put(path, option);
+export const deleteRequest = async (path, option = {}) => {
+    const response = await httpRequest.delete(path, option);
     return response;
 };
 export default httpRequest;

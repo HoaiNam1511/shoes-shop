@@ -25,17 +25,19 @@ const createProduct = async (req, res) => {
         const {
             productName,
             productPrice,
+            productSex,
             categoryStatusId,
             categoryStyleId,
             categoryLineId,
             categoryCollectionId,
             categoryMaterialId,
         } = req.body;
-
+        console.log("come");
         await Product.create({
             product_code: "",
-            product_title: productName,
+            product_name: productName,
             product_price: productPrice,
+            product_sex: productSex,
             fk_category_status_id: categoryStatusId,
             fk_category_style_id: categoryStyleId,
             fk_category_line_id: categoryLineId,
@@ -88,8 +90,9 @@ const getAllProduct = async (req, res) => {
         attributes: [
             "id",
             "product_code",
-            "product_title",
+            "product_name",
             "product_price",
+            "product_sex",
             "fk_category_status_id",
             "fk_category_style_id",
             "fk_category_line_id",
@@ -113,6 +116,7 @@ const updateProduct = async (req, res) => {
         const {
             productName,
             productPrice,
+            productSex,
             categoryStatusId,
             categoryStyleId,
             categoryLineId,
@@ -138,6 +142,7 @@ const updateProduct = async (req, res) => {
             {
                 product_title: productName,
                 product_price: productPrice,
+                product_sex: productSex,
                 fk_category_status_id: categoryStatusId,
                 fk_category_style_id: categoryStyleId,
                 fk_category_line_id: categoryLineId,

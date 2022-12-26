@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     categorys: [],
+    categoryGroups: [],
 };
 const categorySlice = createSlice({
     name: "category",
@@ -10,9 +11,12 @@ const categorySlice = createSlice({
         addCategory(state, action) {
             state.categorys = action.payload;
         },
+        addCategoryGroup(state, action) {
+            state.categoryGroups = action.payload;
+        },
     },
 });
 //Export action
-export const { addCategory } = categorySlice.actions;
+export const { addCategory, addCategoryGroup } = categorySlice.actions;
 
 export default categorySlice;

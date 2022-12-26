@@ -17,19 +17,19 @@ import {
     addProductImage,
     addProductStatus,
 } from "../../redux/Slice/productSlice";
-import { setModalHide } from "../../redux/Slice/modalSlice";
+import { setModalShow } from "../../redux/Slice/modalSlice";
 import { selectReload } from "../../redux/selector";
 
 import config from "../../config";
 import Button from "../../components/Button/Button";
-import ProductModal from "../../components/Modal/ProductModal/ProductModal";
+import ProductModal from "../../components/Modals/ProductModal/ProductModal";
 import ActionButton from "../../components/Button/ActionButton/ActionButton";
 const cx = classNames.bind(styles);
 function Product() {
     const [products, setProducts] = useState([]);
     const dispatch = useDispatch();
     const reload = useSelector(selectReload);
-
+    //Get category
     useEffect(() => {
         const result = async () => {
             try {
@@ -40,8 +40,8 @@ function Product() {
             }
         };
         result();
-    }, []);
-
+    }, [dispatch]);
+    //Get product
     useEffect(() => {
         const result = async () => {
             try {
@@ -53,7 +53,7 @@ function Product() {
             }
         };
         result();
-    }, [reload]);
+    }, [dispatch, reload]);
 
     const handleDeleteProduct = async (id) => {
         const result = async () => {
@@ -72,11 +72,11 @@ function Product() {
         dispatch(addProductStatus("update"));
         dispatch(addProductImage(productImage));
         dispatch(addProductInfo(product));
-        dispatch(setModalHide(false));
+        dispatch(setModalShow(true));
     };
     const handleAddProduct = () => {
         dispatch(addProductStatus("add"));
-        dispatch(setModalHide(false));
+        dispatch(setModalShow(true));
     };
 
     return (
@@ -89,7 +89,7 @@ function Product() {
             </Button>
             <ProductModal></ProductModal>
             <table>
-                <caption>Projetos</caption>
+                <caption>Products</caption>
                 <thead>
                     <tr>
                         <th>#</th>
@@ -113,7 +113,7 @@ function Product() {
                                     />
                                 )}
                             </td>
-                            <td>{product.product_title}</td>
+                            <td>{product.product_name}</td>
                             <td>{product.product_price}</td>
                             <td>
                                 <ActionButton

@@ -7,7 +7,11 @@ export const selectProductImage = (state) => state.productReducer.productImages;
 export const selectReload = (state) => state.productReducer.reload;
 export const selectProductStatus = (state) =>
     state.productReducer.productStatus;
+export const selectIsClearForm = (state) => state.productReducer.isClearForm;
+
 //Export selection category
 export const selectCategory = (state) => state.categoryReducer.categorys;
+export const selectCategoryGroup = (state) =>
+    state.categoryReducer.categoryGroups;
 //Export selection modal
-export const selectModalHide = (state) => state.modalReducer.modalHide;
+export const selectModalShow = (state) => state.modalReducer.isOpenModal;

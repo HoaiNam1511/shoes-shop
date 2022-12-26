@@ -8,6 +8,7 @@ const initialState = {
     productStatus: "",
     modalStatus: false,
     reload: false,
+    isClearForm: false,
 };
 
 const productSlice = createSlice({
@@ -32,6 +33,9 @@ const productSlice = createSlice({
         addReload(state, action) {
             state.reload = action.payload;
         },
+        addClearForm(state, action) {
+            state.isClearForm = action.payload;
+        },
     },
 });
 
@@ -43,6 +47,7 @@ export const {
     addProductImage,
     addProductImageFile,
     addReload,
+    addClearForm,
 } = productSlice.actions;
 
 export default productSlice;

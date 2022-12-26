@@ -4,10 +4,12 @@ export const getProduct = async () => {
     const response = await request.getRequest("product/get");
     return response.data;
 };
-export const createProduct = async (product) => {
-    const response = await request.postRequest("product/create", product, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
+export const createProduct = async (product, option) => {
+    const response = await request.postRequest(
+        "product/create",
+        product,
+        option
+    );
     return response.data;
 };
 export const deleteProduct = async (id) => {

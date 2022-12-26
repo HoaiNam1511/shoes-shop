@@ -4,7 +4,6 @@ $white: #fff;
 $text-color: #161823;
 $font-family:'Roboto';
 $primary: #2f4050;
-   
 
 *{
     box-sizing: border-box;
@@ -75,6 +74,7 @@ table {
   table tbody tr {
     border: 1px solid var(--insideBorderColor);
     background-color: var(--bgColorDarker);
+    // height: 74px;
   }
   
   table tbody tr:nth-child(odd) {

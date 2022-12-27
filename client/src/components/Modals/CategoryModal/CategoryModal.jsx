@@ -1,24 +1,68 @@
-import { useState } from "react";
-import styles from "./CategoryModal.module.scss";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import classNames from "classnames/bind";
 import Modal from "../Modal/Modal";
-import { useSelector } from "react-redux";
-import { selectCategoryGroup } from "../../../redux/selector";
+import styles from "./CategoryModal.module.scss";
+import {
+    selectCategoryGroup,
+    selectReloadCategory,
+    selectCategory,
+    selectCategoryStatus,
+} from "../../../redux/selector";
+import { addReloadCategory } from "../../../redux/Slice/categorySlice";
 import Button from "../../Button/Button";
+import * as service from "../../../service/categoryService";
 const cx = classNames.bind(styles);
 function CategoryModal({ className }) {
+    const dispatch = useDispatch();
+    const reloadCategory = useSelector(selectReloadCategory);
     const categoryGroups = useSelector(selectCategoryGroup);
+    const categoryUpdate = useSelector(selectCategory);
+    let categoryStatus = useSelector(selectCategoryStatus);
+    const { id, fk_category_group_id, category_title } = categoryUpdate;
+
     const [category, setCategory] = useState({
-        categoryGroupId: 1,
+        categoryGroupId: "",
         categoryTitle: "",
     });
+    console.log(category);
+    useEffect(() => {
+        if (categoryGroups.length > 0) {
+            setCategory({
+                categoryGroupId: categoryGroups[0].id,
+                categoryTitle: "",
+            });
+        }
+    }, [categoryGroups]);
     const { categoryGroupId, categoryTitle } = category;
     const handleValueChange = (e) => {
         setCategory({ ...category, [e.target.name]: e.target.value });
     };
-    let productStatus = "add";
-    const handleAddProduct = () => {};
-    const handleUpdateProduct = () => {};
+    const handleAddCategory = async () => {
+        try {
+            const result = await service.addCategory(category);
+            dispatch(addReloadCategory(!reloadCategory));
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleUpdateCategory = async () => {
+        try {
+            const result = await service.updateCategory(id, category);
+            dispatch(addReloadCategory(!reloadCategory));
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    useEffect(() => {
+        if (categoryUpdate) {
+            setCategory({
+                categoryGroupId: fk_category_group_id,
+                categoryTitle: category_title,
+            });
+        }
+    }, [categoryUpdate]);
     return (
         <Modal className={cx("wrapper")} title="Category">
             <div className={cx("content")}>
@@ -49,10 +93,10 @@ function CategoryModal({ className }) {
                     />
                 </div>
             </div>
-            {productStatus === "add" ? (
+            {categoryStatus === "add" ? (
                 <div className={cx("btn-container")}>
                     <Button
-                        onClick={handleAddProduct}
+                        onClick={handleAddCategory}
                         className={cx("modal-btn")}
                     >
                         Add
@@ -61,7 +105,7 @@ function CategoryModal({ className }) {
             ) : (
                 <div className={cx("btn-container")}>
                     <Button
-                        onClick={handleUpdateProduct}
+                        onClick={handleUpdateCategory}
                         className={cx("modal-btn")}
                     >
                         Update

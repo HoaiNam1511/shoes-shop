@@ -10,8 +10,11 @@ export const selectProductStatus = (state) =>
 export const selectIsClearForm = (state) => state.productReducer.isClearForm;
 
 //Export selection category
-export const selectCategory = (state) => state.categoryReducer.categorys;
+export const selectCategory = (state) => state.categoryReducer.category;
 export const selectCategoryGroup = (state) =>
     state.categoryReducer.categoryGroups;
+export const selectReloadCategory = (state) => state.categoryReducer.reload;
+export const selectCategoryStatus = (state) =>
+    state.categoryReducer.categoryStatus;
 //Export selection modal
 export const selectModalShow = (state) => state.modalReducer.isOpenModal;

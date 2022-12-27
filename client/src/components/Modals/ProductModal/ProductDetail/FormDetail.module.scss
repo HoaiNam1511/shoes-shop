@@ -18,13 +18,15 @@ $border: 1px solid rgb(216, 216, 216);
             border-radius: 4px;
             border: $border;
             outline: none; 
+            transition: .2s;
         }
-        .form-input {
-    
+        .form-input:focus {
+            border-color:dodgerBlue;
+            box-shadow:0 0 2px 0 dodgerBlue;
         }
-        .select {
-           
-        } 
+        &:first-child {
+            margin-top: 6px;
+        }
         .radio-container {
             display: flex;
             justify-content: space-evenly;

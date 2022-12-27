@@ -18,7 +18,10 @@ import {
     selectIsClearForm,
 } from "../../../redux/selector";
 
-import { addReload, addClearForm } from "../../../redux/Slice/productSlice";
+import {
+    addReloadProduct,
+    addClearForm,
+} from "../../../redux/Slice/productSlice";
 
 const cx = classNames.bind(styles);
 
@@ -45,7 +48,8 @@ function ProductModal() {
         categoryMaterialId,
     } = useSelector(selectProduct);
 
-    console.log("form modal");
+    // console.log("form modal");
+
     const handleChangeTab = (e) => {
         setTab(e);
     };
@@ -72,7 +76,7 @@ function ProductModal() {
             const response = await productService.createProduct(productData);
             if (response === "success") {
                 setLoading(!loading);
-                dispatch(addReload(!reload));
+                dispatch(addReloadProduct(!reload));
                 dispatch(addClearForm(!isClearForm));
             }
         } catch (error) {
@@ -92,7 +96,7 @@ function ProductModal() {
             );
             if (response === "success") {
                 setLoading(!loading);
-                dispatch(addReload(!reload));
+                dispatch(addReloadProduct(!reload));
             }
         } catch (error) {
             console.log(error);

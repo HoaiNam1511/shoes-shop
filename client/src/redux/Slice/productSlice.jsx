@@ -30,7 +30,7 @@ const productSlice = createSlice({
         addProductImageFile(state, action) {
             state.productImageFiles = action.payload;
         },
-        addReload(state, action) {
+        addReloadProduct(state, action) {
             state.reload = action.payload;
         },
         addClearForm(state, action) {
@@ -46,7 +46,7 @@ export const {
     addProductInfo,
     addProductImage,
     addProductImageFile,
-    addReload,
+    addReloadProduct,
     addClearForm,
 } = productSlice.actions;
 

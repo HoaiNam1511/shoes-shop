@@ -12,7 +12,7 @@ import * as categoryService from "../../service/categoryService";
 import { addCategory } from "../../redux/Slice/categorySlice";
 import {
     addProduct,
-    addReload,
+    addReloadProduct,
     addProductInfo,
     addProductImage,
     addProductStatus,
@@ -24,11 +24,15 @@ import config from "../../config";
 import Button from "../../components/Button/Button";
 import ProductModal from "../../components/Modals/ProductModal/ProductModal";
 import ActionButton from "../../components/Button/ActionButton/ActionButton";
+import Paginate from "../../components/Paginate/Paginate";
 const cx = classNames.bind(styles);
 function Product() {
-    const [products, setProducts] = useState([]);
     const dispatch = useDispatch();
+    const [products, setProducts] = useState([]);
     const reload = useSelector(selectReload);
+    const [itemsOffSet, setItemOffSet] = useState(0);
+    let itemsPerPage = 7;
+    console.log(itemsOffSet);
     //Get category
     useEffect(() => {
         const result = async () => {
@@ -59,7 +63,7 @@ function Product() {
         const result = async () => {
             try {
                 await productService.deleteProduct(id);
-                dispatch(addReload(!reload));
+                dispatch(addReloadProduct(!reload));
             } catch (error) {
                 console.log(error);
             }
@@ -78,7 +82,9 @@ function Product() {
         dispatch(addProductStatus("add"));
         dispatch(setModalShow(true));
     };
-
+    const handlePageChange = (e) => {
+        setItemOffSet(e);
+    };
     return (
         <div>
             <Button
@@ -100,37 +106,46 @@ function Product() {
                     </tr>
                 </thead>
                 <tbody>
-                    {products.map((product) => (
-                        <tr key={product.id}>
-                            <td>{product.id}</td>
-                            {/* Xem lai phan nay */}
-                            <td style={{ display: "flex" }}>
-                                {product.Product_images[0] && (
-                                    <img
-                                        className={cx("image")}
-                                        src={`${config.url.URL_STATIC_FILE}${product.Product_images[0].image}`}
-                                        alt=""
-                                    />
-                                )}
-                            </td>
-                            <td>{product.product_name}</td>
-                            <td>{product.product_price}</td>
-                            <td>
-                                <ActionButton
-                                    type="delete"
-                                    onClick={() =>
-                                        handleDeleteProduct(product.id)
-                                    }
-                                ></ActionButton>
-                                <ActionButton
-                                    type="update"
-                                    onClick={() => handleUpdateProduct(product)}
-                                ></ActionButton>
-                            </td>
-                        </tr>
-                    ))}
+                    {products
+                        .slice(itemsOffSet, itemsOffSet + itemsPerPage)
+                        .map((product) => (
+                            <tr key={product.id}>
+                                <td>{product.id}</td>
+                                {/* Xem lai phan nay */}
+                                <td style={{ display: "flex" }}>
+                                    {product.Product_images[0] && (
+                                        <img
+                                            className={cx("image")}
+                                            src={`${config.url.URL_STATIC_FILE}${product.Product_images[0].image}`}
+                                            alt=""
+                                        />
+                                    )}
+                                </td>
+                                <td>{product.product_name}</td>
+                                <td>{product.product_price}</td>
+                                <td>
+                                    <ActionButton
+                                        type="delete"
+                                        onClick={() =>
+                                            handleDeleteProduct(product.id)
+                                        }
+                                    ></ActionButton>
+                                    <ActionButton
+                                        type="update"
+                                        onClick={() =>
+                                            handleUpdateProduct(product)
+                                        }
+                                    ></ActionButton>
+                                </td>
+                            </tr>
+                        ))}
                 </tbody>
             </table>
+            <Paginate
+                data={products}
+                itemsPerPage={itemsPerPage}
+                onClick={handlePageChange}
+            ></Paginate>
         </div>
     );
 }

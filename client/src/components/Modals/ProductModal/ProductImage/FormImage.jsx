@@ -18,7 +18,7 @@ import config from "../../../../config";
 
 const cx = classNames.bind(styles);
 function FormImage({ className }) {
-    console.log("form image");
+    // console.log("form image");
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
     const dispatch = useDispatch();

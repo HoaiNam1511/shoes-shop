@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import classNames from "classnames/bind";
 import { useDispatch, useSelector } from "react-redux";
-
 import {
     selectCategory,
     selectProduct,
@@ -18,7 +17,7 @@ function FormInfo({ className }) {
     const categorys = useSelector(selectCategory);
     const productInfo = useSelector(selectProduct);
     const isClearForm = useSelector(selectIsClearForm);
-    console.log("form info");
+    // console.log("form info");
     const [product, setProduct] = useState({
         productId: "",
         productName: "",
@@ -41,7 +40,6 @@ function FormInfo({ className }) {
         categoryCollectionId,
         categoryMaterialId,
     } = product;
-
     const productsSex = [
         {
             id: 1,
@@ -129,7 +127,7 @@ function FormInfo({ className }) {
                     className={cx("form-input")}
                     type="text"
                     placeholder="Product name"
-                    value={productName || ""}
+                    value={productName}
                     name="productName"
                     onChange={handleValueChange}
                 />
@@ -158,13 +156,13 @@ function FormInfo({ className }) {
                 </div>
             </div>
             <div className={cx("form-group", "flex-2")}>
-                <div className={cx("form-group", "flex-item")}>
+                <div className={cx("flex-item")}>
                     <label className={cx("input-label")}>Price</label>
                     <input
                         className={cx("form-input")}
                         type="text"
                         placeholder="Product price"
-                        value={productPrice || ""}
+                        value={productPrice}
                         name="productPrice"
                         onChange={handleValueChange}
                     />
@@ -193,7 +191,7 @@ function FormInfo({ className }) {
                 </div>
             </div>
             <div className={cx("form-group", "flex-2")}>
-                <div className={cx("form-group", "flex-item")}>
+                <div className={cx("flex-item")}>
                     <label className={cx("input-label")}>Style</label>
                     <select
                         className={cx("select")}
@@ -240,7 +238,7 @@ function FormInfo({ className }) {
             </div>
 
             <div className={cx("form-group", "flex-2")}>
-                <div className={cx("form-group", "flex-item")}>
+                <div className={cx("flex-item")}>
                     <label className={cx("input-label")}>Collection</label>
                     <select
                         className={cx("select")}

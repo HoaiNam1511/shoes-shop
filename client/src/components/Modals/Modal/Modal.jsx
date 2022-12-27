@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Modal.module.scss";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,17 +14,11 @@ function Modal({ children, className, title = "THIS IS TITLE" }) {
     const handleCloseModal = () => {
         dispatch(setModalShow(false));
     };
-    const classes = cx("modal", { [className]: className });
     return (
         <>
             {modalShow && (
-                <div
-                    className={cx("wrapper", {
-                        // "modal-show": visible,
-                        // "modal-hide": !visible,
-                    })}
-                >
-                    <div className={classes}>
+                <div className={cx("wrapper")}>
+                    <div className={cx("modal", { [className]: className })}>
                         <div className={cx("header")}>
                             <h2 className={cx("title")}>{title}</h2>
                             <button

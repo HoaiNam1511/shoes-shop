@@ -5,27 +5,26 @@ import Modal from "../Modal/Modal";
 import styles from "./CategoryModal.module.scss";
 import {
     selectCategoryGroup,
-    selectReloadCategory,
     selectCategory,
-    selectCategoryStatus,
+    selectReload,
+    selectActionBtnTitle,
 } from "../../../redux/selector";
-import { addReloadCategory } from "../../../redux/Slice/categorySlice";
+import { addReload } from "../../../redux/Slice/globalSlice";
 import Button from "../../Button/Button";
 import * as service from "../../../service/categoryService";
 const cx = classNames.bind(styles);
 function CategoryModal({ className }) {
     const dispatch = useDispatch();
-    const reloadCategory = useSelector(selectReloadCategory);
+    const reloadCategory = useSelector(selectReload);
     const categoryGroups = useSelector(selectCategoryGroup);
     const categoryUpdate = useSelector(selectCategory);
-    let categoryStatus = useSelector(selectCategoryStatus);
+    let categoryStatus = useSelector(selectActionBtnTitle);
     const { id, fk_category_group_id, category_title } = categoryUpdate;
 
     const [category, setCategory] = useState({
         categoryGroupId: "",
         categoryTitle: "",
     });
-    console.log(category);
     useEffect(() => {
         if (categoryGroups.length > 0) {
             setCategory({
@@ -41,7 +40,7 @@ function CategoryModal({ className }) {
     const handleAddCategory = async () => {
         try {
             const result = await service.addCategory(category);
-            dispatch(addReloadCategory(!reloadCategory));
+            dispatch(addReload(!reloadCategory));
         } catch (error) {
             console.log(error);
         }
@@ -50,7 +49,7 @@ function CategoryModal({ className }) {
     const handleUpdateCategory = async () => {
         try {
             const result = await service.updateCategory(id, category);
-            dispatch(addReloadCategory(!reloadCategory));
+            dispatch(addReload(!reloadCategory));
         } catch (error) {
             console.log(error);
         }

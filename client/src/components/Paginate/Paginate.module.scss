@@ -1,3 +1,4 @@
+@import '../../components/GlobalStyle/GlobalStyle.scss';
 $paddingPagination: 6px;
 .wrapper {
     position: absolute;
@@ -21,18 +22,18 @@ $paddingPagination: 6px;
   .pagination-btn a {
     padding: $paddingPagination;  
     margin: 0px 2px;
-    border: 1px solid #2f4050;
-    color: #2f4050;
+    border: 1px solid $primary;
+    color: $primary;
     cursor: pointer;
    
   }  
   .active a{
-    background-color: #2f4050;
+    background-color: $primary;
     color: white;  
 }
   .pagination-btn a:hover {
     color: white;  
-    background-color: #2f4050;
+    background-color: $primary;
   }  
   
 //   .pagination--active a {

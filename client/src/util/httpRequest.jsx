@@ -18,7 +18,6 @@ export const putRequest = async (path, option = {}) => {
     return response;
 };
 export const deleteRequest = async (path, option = {}) => {
-    console.log(path);
     const response = await httpRequest.delete(path, option);
     return response;
 };

@@ -1,5 +1,6 @@
 const Category = require("../models/categorys");
 const Category_group = require("../models/category_groups");
+const ITEM_PER_PAGE = 10;
 const getALLCategoryGroup = async (req, res) => {
     await Category_group.findAll({
         attributes: ["id", "category_group_title"],
@@ -11,22 +12,53 @@ const getALLCategoryGroup = async (req, res) => {
 };
 
 const getAllCategory = async (req, res) => {
-    await Category.findAll({
-        attributes: ["id", "fk_category_group_id", "category_title"],
-        include: [
-            {
-                model: Category_group,
-                //attributes: ["category_group_title"],
-            },
-        ],
-        order: [["fk_category_group_id", "ASC"]],
-    })
-        .then((categorys) => {
-            res.send(categorys);
+    let page = req.query.page;
+    if (page) {
+        const offset = (page - 1) * ITEM_PER_PAGE;
+        await Category.findAndCountAll({
+            attributes: ["id", "fk_category_group_id", "category_title"],
+            include: [
+                {
+                    model: Category_group,
+                    //attributes: ["category_group_title"],
+                },
+            ],
+            offset: offset,
+            limit: ITEM_PER_PAGE,
+            order: [["fk_category_group_id", "ASC"]],
         })
-        .catch((error) => {
-            console.log(error);
-        });
+            .then((categorys) => {
+                const totalPage = Math.ceil(categorys.count / ITEM_PER_PAGE);
+                res.send({
+                    totalPage: totalPage,
+                    data: categorys.rows,
+                });
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    } else {
+        await Category.findAndCountAll({
+            attributes: ["id", "fk_category_group_id", "category_title"],
+            include: [
+                {
+                    model: Category_group,
+                    //attributes: ["category_group_title"],
+                },
+            ],
+            order: [["fk_category_group_id", "ASC"]],
+        })
+            .then((categorys) => {
+                const totalPage = Math.ceil(categorys.count / ITEM_PER_PAGE);
+                res.send({
+                    totalPage: totalPage,
+                    data: categorys.rows,
+                });
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
 };
 
 const createCategory = async (req, res) => {
@@ -46,7 +78,6 @@ const createCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
     const { categoryTitle, categoryGroupId } = req.body;
     const id = req.params.id;
-    console.log(id);
     await Category.update(
         {
             fk_category_group_id: categoryGroupId,

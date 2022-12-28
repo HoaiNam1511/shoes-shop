@@ -9,12 +9,11 @@ function App() {
             <Routes>
                 {router.map((route, index) => {
                     let Layout = MainLayout;
-
-                    // if (route.layout === null) {
-                    //   Layout = Fragment;
-                    // } else if (route.layout) {
-                    //   Layout = route.layout;
-                    // }
+                    if (route.layout === null) {
+                        Layout = Fragment;
+                    } else if (route.layout) {
+                        Layout = route.layout;
+                    }
                     let Page = route.component;
                     return (
                         <Route

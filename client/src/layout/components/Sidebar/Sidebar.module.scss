@@ -7,6 +7,7 @@ $sidebar-bg-active:#293846;
     min-height: 100vh;
     background-color: $sidebar-bg-default;
     width: 280px;
+    position: relative;
 }
 
 .sidebar-item {
@@ -56,5 +57,18 @@ $sidebar-bg-active:#293846;
     .item-icon, .item-title {
         color: $sidebar-active-color;
     }
+}
+.btn-logout {
+    position: absolute;
+    bottom: 30px;
+}
+.default {
+    background-color: $sidebar-bg-default;
+    .item-icon, .item-title {
+        color: $sidebar-default-color;
+    }
+    &:hover .item-icon,  &:hover .item-title   {
+        color: $sidebar-active-color;
+    }  
 }
 

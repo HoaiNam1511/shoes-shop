@@ -14,14 +14,11 @@ import {
     selectProductImage,
     selectReload,
     selectProductImageFile,
-    selectProductStatus,
     selectIsClearForm,
+    selectActionBtnTitle,
 } from "../../../redux/selector";
 
-import {
-    addReloadProduct,
-    addClearForm,
-} from "../../../redux/Slice/productSlice";
+import { addReload, addClearForm } from "../../../redux/Slice/globalSlice";
 
 const cx = classNames.bind(styles);
 
@@ -32,7 +29,7 @@ function ProductModal() {
 
     const productImageFiles = useSelector(selectProductImageFile);
     const productImages = useSelector(selectProductImage);
-    const productStatus = useSelector(selectProductStatus);
+    const productStatus = useSelector(selectActionBtnTitle);
     const isClearForm = useSelector(selectIsClearForm);
     const reload = useSelector(selectReload);
     let productData = new FormData();
@@ -76,7 +73,7 @@ function ProductModal() {
             const response = await productService.createProduct(productData);
             if (response === "success") {
                 setLoading(!loading);
-                dispatch(addReloadProduct(!reload));
+                dispatch(addReload(!reload));
                 dispatch(addClearForm(!isClearForm));
             }
         } catch (error) {
@@ -96,7 +93,7 @@ function ProductModal() {
             );
             if (response === "success") {
                 setLoading(!loading);
-                dispatch(addReloadProduct(!reload));
+                dispatch(addReload(!reload));
             }
         } catch (error) {
             console.log(error);

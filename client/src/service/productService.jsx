@@ -1,8 +1,13 @@
 import * as request from "../util/httpRequest";
 
-export const getProduct = async () => {
-    const response = await request.getRequest("product/get");
-    return response.data;
+export const getProduct = async (page) => {
+    let result;
+    if (page) {
+        result = await request.getRequest(`product?page=${page}`);
+    } else {
+        result = await request.getRequest("product/get");
+    }
+    return result.data;
 };
 export const createProduct = async (product, option) => {
     const response = await request.postRequest(

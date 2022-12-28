@@ -1,0 +1,38 @@
+$border: 1px solid rgb(216, 216, 216);
+.wrapper {
+    width: 385px;
+    .content {
+        
+    }
+}
+.form-group {
+    height: 60px;
+    .input-label, .form-input {
+        color: #161823;
+    }
+
+    .input-label {
+        display: block;
+        font-size: 1.4rem;
+    }
+    .form-input, .select {
+        height: 35px;
+        width: 100%;
+        font-size: 1.6rem;
+        padding: 0 10px;
+        border-radius: 4px;
+        border: $border;
+        outline: none; 
+        transition: .2s;
+    }
+    .form-input:focus {
+        border-color:dodgerBlue;
+        box-shadow:0 0 2px 0 dodgerBlue;
+    }
+
+}
+.btn-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}

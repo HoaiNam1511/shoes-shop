@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import productSlice from "./Slice/productSlice";
 import categorySlice from "./Slice/categorySlice";
-import modalSlice from "./Slice/modalSlice";
+import globalSlice from "./Slice/globalSlice";
 const store = configureStore({
     reducer: {
         productReducer: productSlice.reducer,
         categoryReducer: categorySlice.reducer,
-        modalReducer: modalSlice.reducer,
+        globalReducer: globalSlice.reducer,
     },
 
     //Default middleware

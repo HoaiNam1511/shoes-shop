@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Modal.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { setModalShow } from "../../../redux/Slice/modalSlice";
+import { addModalStatus } from "../../../redux/Slice/globalSlice";
 
 import { selectModalShow } from "../../../redux/selector";
 
@@ -12,7 +12,7 @@ function Modal({ children, className, title = "THIS IS TITLE" }) {
     const dispatch = useDispatch();
     let modalShow = useSelector(selectModalShow);
     const handleCloseModal = () => {
-        dispatch(setModalShow(false));
+        dispatch(addModalStatus(false));
     };
     return (
         <>

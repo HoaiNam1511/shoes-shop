@@ -1,7 +1,12 @@
 import * as request from "../util/httpRequest";
 
-export const getCategory = async () => {
-    const result = await request.getRequest("category/get/");
+export const getCategory = async (page) => {
+    let result;
+    if (page) {
+        result = await request.getRequest(`category?page=${page}`);
+    } else {
+        result = await request.getRequest("category/get/");
+    }
     return result.data;
 };
 

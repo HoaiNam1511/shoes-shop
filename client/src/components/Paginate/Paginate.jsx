@@ -2,13 +2,9 @@ import ReactPaginate from "react-paginate";
 import classNames from "classnames/bind";
 import styles from "./Paginate.module.scss";
 const cx = classNames.bind(styles);
-function Paginate({ data, itemsPerPage, onClick }) {
-    const pageCount = Math.ceil(data.length / itemsPerPage);
-
+function Paginate({ pageCount, onClick }) {
     const handlePageClick = (event) => {
-        //event.selected chua vi tri cua trang * so luong phan tu hien thi
-        const newOffset = (event.selected * itemsPerPage) % data.length;
-        onClick(newOffset);
+        onClick(event.selected + 1);
     };
 
     return (

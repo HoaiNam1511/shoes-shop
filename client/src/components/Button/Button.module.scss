@@ -1,8 +1,8 @@
-$primary: #2f4050;
+@import '../../components/GlobalStyle/GlobalStyle.scss';
 .button, .outLine {
     width: 95px;
     height: 35px;
-    background-color: #2f4050;
+    background-color: $primary;
     color: #fff;
     border-radius: 4px;
     font-size: 16px;
@@ -24,7 +24,7 @@ $primary: #2f4050;
     }
 }
 .outLine {
-    border: 2px solid #2f4050;
+    border: 2px solid $primary;
     background-color: #fff;
     color: #161823;
 }

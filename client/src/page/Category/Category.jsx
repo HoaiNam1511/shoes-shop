@@ -3,32 +3,43 @@ import { useEffect, useState } from "react";
 import styles from "./Category.module.scss";
 import classNames from "classnames/bind";
 import { useDispatch, useSelector } from "react-redux";
-
 import AddIcon from "@mui/icons-material/Add";
 
 import CategoryModal from "../../components/Modals/CategoryModal/CategoryModal";
 import Button from "../../components/Button/Button";
 import ActionButton from "../../components/Button/ActionButton/ActionButton";
-
-import { setModalShow } from "../../redux/Slice/modalSlice";
+import { useNavigate } from "react-router-dom";
+import { addCategoryGroup, addCategory } from "../../redux/Slice/categorySlice";
 import {
-    addCategoryGroup,
-    addReloadCategory,
-    addCategoryStatus,
-    addCategory,
-} from "../../redux/Slice/categorySlice";
-import { selectReloadCategory } from "../../redux/selector";
+    addReload,
+    addModalStatus,
+    addActionBtnTitle,
+} from "../../redux/Slice/globalSlice";
+import { selectReload } from "../../redux/selector";
 
 import * as categoryService from "../../service/categoryService";
+import Paginate from "../../components/Paginate/Paginate";
+import useAuth from "../../hooks/useAuth";
 const cx = classNames.bind(styles);
 
 function Category() {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [categorys, setCategorys] = useState([]);
-    const reloadCategory = useSelector(selectReloadCategory);
+    const [pageCount, setPageCount] = useState(0);
+    const [page, setPage] = useState(1);
+    const reloadCategory = useSelector(selectReload);
+    console.log("come category");
+    // const auth = useAuth();
+    // const loader = async () => {
+    //     if (!auth) {
+    //         navigate("/login");
+    //     }
+    // };
+    // loader();
     const handleAddProduct = () => {
-        dispatch(addCategoryStatus("add"));
-        dispatch(setModalShow(true));
+        dispatch(addActionBtnTitle("add"));
+        dispatch(addModalStatus(true));
     };
 
     useEffect(() => {
@@ -46,20 +57,21 @@ function Category() {
     useEffect(() => {
         const result = async () => {
             try {
-                const response = await categoryService.getCategory();
-                setCategorys(response);
+                const response = await categoryService.getCategory(page);
+                setCategorys(response.data);
+                setPageCount(response.totalPage);
             } catch (error) {
                 console.log(error);
             }
         };
         result();
-    }, [reloadCategory]);
+    }, [reloadCategory, page]);
 
     const handleDeleteCategory = (id) => {
         const result = async () => {
             try {
                 await categoryService.deleteCategory(id);
-                dispatch(addReloadCategory(!reloadCategory));
+                dispatch(addReload(!reloadCategory));
             } catch (error) {
                 console.log(error);
             }
@@ -67,11 +79,10 @@ function Category() {
         result();
     };
     const handleUpdateCategory = (category) => {
-        dispatch(addCategoryStatus("update"));
+        dispatch(addActionBtnTitle("update"));
         dispatch(addCategory(category));
-        dispatch(setModalShow(true));
+        dispatch(addModalStatus(true));
     };
-
     return (
         <div>
             <Button
@@ -117,6 +128,10 @@ function Category() {
                     ))}
                 </tbody>
             </table>
+            <Paginate
+                pageCount={pageCount}
+                onClick={(page) => setPage(page)}
+            ></Paginate>
         </div>
     );
 }

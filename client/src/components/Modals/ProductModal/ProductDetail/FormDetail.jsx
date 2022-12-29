@@ -2,14 +2,15 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import classNames from "classnames/bind";
 import { useDispatch, useSelector } from "react-redux";
+
+import styles from "./FormDetail.module.scss";
+
 import {
     selectCategory,
     selectProduct,
     selectIsClearForm,
 } from "../../../../redux/selector";
 import { addProductInfo } from "../../../../redux/Slice/productSlice";
-
-import styles from "./FormDetail.module.scss";
 
 const cx = classNames.bind(styles);
 function FormInfo({ className }) {
@@ -22,7 +23,7 @@ function FormInfo({ className }) {
         productId: "",
         productName: "",
         productPrice: "",
-        productSex: "",
+        productSex: "male",
         categoryStatusId: "",
         categoryStyleId: "",
         categoryLineId: "",
@@ -89,10 +90,7 @@ function FormInfo({ className }) {
 
         if (initialCategoryId.length > 0) {
             setProduct({
-                productId: "",
-                productName: "",
-                productPrice: "",
-                productSex: "male",
+                ...product,
                 categoryStatusId: initialCategoryId[0].id,
                 categoryStyleId: initialCategoryId[1].id,
                 categoryLineId: initialCategoryId[2].id,

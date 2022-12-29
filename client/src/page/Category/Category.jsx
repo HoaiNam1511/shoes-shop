@@ -2,23 +2,26 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import styles from "./Category.module.scss";
 import classNames from "classnames/bind";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+
 import AddIcon from "@mui/icons-material/Add";
+
+import * as categoryService from "../../service/categoryService";
 
 import CategoryModal from "../../components/Modals/CategoryModal/CategoryModal";
 import Button from "../../components/Button/Button";
 import ActionButton from "../../components/Button/ActionButton/ActionButton";
-import { useNavigate } from "react-router-dom";
+import Paginate from "../../components/Paginate/Paginate";
+
 import { addCategoryGroup, addCategory } from "../../redux/Slice/categorySlice";
 import {
     addReload,
     addModalStatus,
     addActionBtnTitle,
 } from "../../redux/Slice/globalSlice";
-import { selectReload } from "../../redux/selector";
+import { selectReload, selectModalShow } from "../../redux/selector";
 
-import * as categoryService from "../../service/categoryService";
-import Paginate from "../../components/Paginate/Paginate";
 import useAuth from "../../hooks/useAuth";
 const cx = classNames.bind(styles);
 
@@ -28,8 +31,8 @@ function Category() {
     const [categorys, setCategorys] = useState([]);
     const [pageCount, setPageCount] = useState(0);
     const [page, setPage] = useState(1);
-    const reloadCategory = useSelector(selectReload);
-    console.log("come category");
+    const reload = useSelector(selectReload);
+    const modalStatus = useSelector(selectModalShow);
     // const auth = useAuth();
     // const loader = async () => {
     //     if (!auth) {
@@ -39,7 +42,7 @@ function Category() {
     // loader();
     const handleAddProduct = () => {
         dispatch(addActionBtnTitle("add"));
-        dispatch(addModalStatus(true));
+        dispatch(addModalStatus(!modalStatus));
     };
 
     useEffect(() => {
@@ -65,13 +68,13 @@ function Category() {
             }
         };
         result();
-    }, [reloadCategory, page]);
+    }, [reload, page]);
 
     const handleDeleteCategory = (id) => {
         const result = async () => {
             try {
                 await categoryService.deleteCategory(id);
-                dispatch(addReload(!reloadCategory));
+                dispatch(addReload(!reload));
             } catch (error) {
                 console.log(error);
             }
@@ -81,7 +84,7 @@ function Category() {
     const handleUpdateCategory = (category) => {
         dispatch(addActionBtnTitle("update"));
         dispatch(addCategory(category));
-        dispatch(addModalStatus(true));
+        dispatch(addModalStatus(!modalStatus));
     };
     return (
         <div>

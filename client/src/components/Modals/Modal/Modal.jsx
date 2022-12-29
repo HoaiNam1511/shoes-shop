@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import { useRef, useState } from "react";
 import classNames from "classnames/bind";
+
 import styles from "./Modal.module.scss";
+
 import { useDispatch, useSelector } from "react-redux";
 import { addModalStatus } from "../../../redux/Slice/globalSlice";
-
 import { selectModalShow } from "../../../redux/selector";
 
 const cx = classNames.bind(styles);

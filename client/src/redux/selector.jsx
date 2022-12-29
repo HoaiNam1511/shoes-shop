@@ -1,5 +1,4 @@
 //Export selector product
-export const selectProducts = (state) => state.productReducer.products;
 export const selectProduct = (state) => state.productReducer.product;
 export const selectProductImageFile = (state) =>
     state.productReducer.productImageFiles;
@@ -14,3 +13,5 @@ export const selectActionBtnTitle = (state) =>
 export const selectModalShow = (state) => state.globalReducer.modalStatus;
 export const selectReload = (state) => state.globalReducer.reload;
 export const selectIsClearForm = (state) => state.globalReducer.isClearForm;
+//User
+export const selectUser = (state) => state.userReducer.user;

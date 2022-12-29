@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const db = require("../config/connectDB");
+const User_role = require("./userRoles");
 const User = db.define("User", {
     id: {
         type: Sequelize.INTEGER(10),
@@ -24,4 +25,6 @@ const User = db.define("User", {
         allowNull: false,
     },
 });
+User.hasOne(User_role, { as: "use_role", foreignKey: "fk_user_id" });
+User_role.belongsTo(User, { as: "use_role", foreignKey: "fk_user_id" });
 module.exports = User;

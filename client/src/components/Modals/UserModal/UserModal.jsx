@@ -1,110 +1,172 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import classNames from "classnames/bind";
-import Modal from "../Modal/Modal";
+
+import * as userService from "../../../service/userService";
+
 import styles from "./UserModal.module.scss";
-import {
-    selectCategoryGroup,
-    selectReload,
-    selectCategory,
-    selectActionBtnTitle,
-} from "../../../redux/selector";
-import { addReloadCategory } from "../../../redux/Slice/categorySlice";
+import Modal from "../Modal/Modal";
 import Button from "../../Button/Button";
-import * as service from "../../../service/categoryService";
+
+import { selectReload, selectActionBtnTitle } from "../../../redux/selector";
+import { addReload } from "../../../redux/Slice/globalSlice";
+import { selectUser } from "../../../redux/selector";
+
 const cx = classNames.bind(styles);
 function UserModal({ className }) {
     const dispatch = useDispatch();
-    const reloadCategory = useSelector(selectReload);
-    const categoryGroups = useSelector(selectCategoryGroup);
-    const categoryUpdate = useSelector(selectCategory);
-    let categoryStatus = useSelector(selectActionBtnTitle);
-    const { id, fk_category_group_id, category_title } = categoryUpdate;
-
-    const [category, setCategory] = useState({
-        categoryGroupId: "",
-        categoryTitle: "",
+    const [roles, setRoles] = useState([]);
+    const reload = useSelector(selectReload);
+    const actionButtonTitle = useSelector(selectActionBtnTitle);
+    const userRedux = useSelector(selectUser);
+    const [user, setUser] = useState({
+        id: "",
+        email: "",
+        useName: "",
+        password: "",
+        status: true,
+        role: "",
     });
+    const { id, email, useName, password, status, role } = user;
+    const accountStatus = [
+        {
+            id: 1,
+            title: "Enable",
+            status: true,
+        },
+        {
+            id: 2,
+            title: "Disable",
+            status: false,
+        },
+    ];
     useEffect(() => {
-        if (categoryGroups.length > 0) {
-            setCategory({
-                categoryGroupId: categoryGroups[0].id,
-                categoryTitle: "",
-            });
-        }
-    }, [categoryGroups]);
-    const { categoryGroupId, categoryTitle } = category;
+        setUser({
+            id: userRedux.id,
+            email: userRedux.email,
+            useName: userRedux.user_name,
+            password: userRedux.password,
+            status: userRedux.status,
+            role: "",
+        });
+    }, [userRedux]);
+    useEffect(() => {
+        const result = async () => {
+            try {
+                const response = await userService.getRole();
+                setRoles(response);
+                setUser({
+                    ...user,
+                    role: response[0].id,
+                    status: accountStatus[0].status,
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        result();
+    }, []);
+
     const handleValueChange = (e) => {
-        setCategory({ ...category, [e.target.name]: e.target.value });
+        setUser({ ...user, [e.target.name]: e.target.value });
     };
-    const handleAddCategory = async () => {
+    const handleAddUser = async () => {
         try {
-            const result = await service.addCategory(category);
-            dispatch(addReloadCategory(!reloadCategory));
+            await userService.createUser(user);
+            dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
         }
     };
 
-    const handleUpdateCategory = async () => {
+    const handleUpdateUser = async () => {
         try {
-            const result = await service.updateCategory(id, category);
-            dispatch(addReloadCategory(!reloadCategory));
+            await userService.updateUser(id, user);
+            dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
         }
     };
-    useEffect(() => {
-        if (categoryUpdate) {
-            setCategory({
-                categoryGroupId: fk_category_group_id,
-                categoryTitle: category_title,
-            });
-        }
-    }, [categoryUpdate]);
+
     return (
-        <Modal className={cx("wrapper")} title="Category">
+        <Modal className={cx("wrapper")} title="User">
             <div className={cx("content")}>
                 <div className={cx("form-group")}>
-                    <label className={cx("input-label")}>Product Status</label>
+                    <label className={cx("input-label")}>Enter Email *</label>
+                    <input
+                        className={cx("form-input")}
+                        type="text"
+                        placeholder="Email"
+                        value={email}
+                        name="email"
+                        onChange={handleValueChange}
+                    />
+                </div>
+                <div className={cx("form-group")}>
+                    <label className={cx("input-label")}>User Name *</label>
+                    <input
+                        className={cx("form-input")}
+                        type="text"
+                        placeholder="User name"
+                        value={useName}
+                        name="useName"
+                        onChange={handleValueChange}
+                    />
+                </div>
+                <div className={cx("form-group")}>
+                    <label className={cx("input-label")}>Password *</label>
+                    <input
+                        className={cx("form-input")}
+                        type="text"
+                        placeholder="Password"
+                        value={password}
+                        name="password"
+                        onChange={handleValueChange}
+                    />
+                </div>
+
+                <div className={cx("form-group")}>
+                    <label className={cx("input-label")}>Account Status</label>
                     <select
                         className={cx("select")}
-                        name="categoryGroupId"
+                        name="status"
+                        value={status}
                         onChange={handleValueChange}
-                        value={categoryGroupId}
                     >
-                        {categoryGroups.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.category_group_title}
+                        {accountStatus.map((status) => (
+                            <option key={status.id} value={status.id}>
+                                {status.title}
                             </option>
                         ))}
                     </select>
                 </div>
+
                 <div className={cx("form-group")}>
-                    <label className={cx("input-label")}>Name</label>
-                    <input
-                        className={cx("form-input")}
-                        type="text"
-                        placeholder="Product name"
-                        value={categoryTitle}
-                        name="categoryTitle"
+                    <label className={cx("input-label")}>Role & Access</label>
+                    <select
+                        className={cx("select")}
+                        name="role"
                         onChange={handleValueChange}
-                    />
+                        value={role}
+                    >
+                        {roles.map((role) => (
+                            <option key={role.id} value={role.id}>
+                                {`${role.name} - ${role.description}`}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
-            {categoryStatus === "add" ? (
+            {actionButtonTitle === "add" ? (
                 <div className={cx("btn-container")}>
-                    <Button
-                        onClick={handleAddCategory}
-                        className={cx("modal-btn")}
-                    >
+                    <Button onClick={handleAddUser} className={cx("modal-btn")}>
                         Add
                     </Button>
                 </div>
             ) : (
                 <div className={cx("btn-container")}>
                     <Button
-                        onClick={handleUpdateCategory}
+                        onClick={handleUpdateUser}
                         className={cx("modal-btn")}
                     >
                         Update

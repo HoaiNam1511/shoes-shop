@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import classNames from "classnames/bind";
 import Modal from "../Modal/Modal";
+
+import * as service from "../../../service/categoryService";
+
+import Button from "../../Button/Button";
 import styles from "./CategoryModal.module.scss";
+
 import {
     selectCategoryGroup,
     selectCategory,
@@ -10,15 +15,15 @@ import {
     selectActionBtnTitle,
 } from "../../../redux/selector";
 import { addReload } from "../../../redux/Slice/globalSlice";
-import Button from "../../Button/Button";
-import * as service from "../../../service/categoryService";
+
 const cx = classNames.bind(styles);
+
 function CategoryModal({ className }) {
     const dispatch = useDispatch();
-    const reloadCategory = useSelector(selectReload);
+    const reload = useSelector(selectReload);
     const categoryGroups = useSelector(selectCategoryGroup);
     const categoryUpdate = useSelector(selectCategory);
-    let categoryStatus = useSelector(selectActionBtnTitle);
+    let actionBtnTitle = useSelector(selectActionBtnTitle);
     const { id, fk_category_group_id, category_title } = categoryUpdate;
 
     const [category, setCategory] = useState({
@@ -39,8 +44,8 @@ function CategoryModal({ className }) {
     };
     const handleAddCategory = async () => {
         try {
-            const result = await service.addCategory(category);
-            dispatch(addReload(!reloadCategory));
+            await service.addCategory(category);
+            dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
         }
@@ -48,8 +53,8 @@ function CategoryModal({ className }) {
 
     const handleUpdateCategory = async () => {
         try {
-            const result = await service.updateCategory(id, category);
-            dispatch(addReload(!reloadCategory));
+            await service.updateCategory(id, category);
+            dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
         }
@@ -92,7 +97,7 @@ function CategoryModal({ className }) {
                     />
                 </div>
             </div>
-            {categoryStatus === "add" ? (
+            {actionBtnTitle === "add" ? (
                 <div className={cx("btn-container")}>
                     <Button
                         onClick={handleAddCategory}

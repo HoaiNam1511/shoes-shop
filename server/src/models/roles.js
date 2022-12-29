@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const db = require("../config/connectDB");
+const User_role = require("../models/userRoles");
 const Role = db.define("Role", {
     id: {
         type: Sequelize.INTEGER(10),
@@ -16,3 +17,5 @@ const Role = db.define("Role", {
         allowNull: false,
     },
 });
+
+module.exports = Role;

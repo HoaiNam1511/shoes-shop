@@ -9,27 +9,25 @@ import AddIcon from "@mui/icons-material/Add";
 import * as productService from "../../service/productService";
 import * as categoryService from "../../service/categoryService";
 
-import { addCategory } from "../../redux/Slice/categorySlice";
-import {
-    addProduct,
-    addProductInfo,
-    addProductImage,
-} from "../../redux/Slice/productSlice";
-
-import {
-    addActionBtnTitle,
-    addModalStatus,
-    addReload,
-    addClearForm,
-} from "../../redux/Slice/globalSlice";
-
-import { selectReload } from "../../redux/selector";
-
 import config from "../../config";
 import Button from "../../components/Button/Button";
 import ProductModal from "../../components/Modals/ProductModal/ProductModal";
 import ActionButton from "../../components/Button/ActionButton/ActionButton";
 import Paginate from "../../components/Paginate/Paginate";
+
+import { addCategory } from "../../redux/Slice/categorySlice";
+import {
+    addProductInfo,
+    addProductImage,
+} from "../../redux/Slice/productSlice";
+import {
+    addActionBtnTitle,
+    addModalStatus,
+    addReload,
+} from "../../redux/Slice/globalSlice";
+
+import { selectReload } from "../../redux/selector";
+
 const cx = classNames.bind(styles);
 function Product() {
     console.log("come product");
@@ -38,7 +36,6 @@ function Product() {
     const [page, setPage] = useState(1);
     const [pageCount, setPageCount] = useState(0);
     const reload = useSelector(selectReload);
-    localStorage.setItem("product", "localStorage");
     //Get category
     useEffect(() => {
         const result = async () => {
@@ -58,8 +55,6 @@ function Product() {
                 const response = await productService.getProduct(page);
                 setProducts(response.data);
                 setPageCount(response.totalPage);
-                //Xoa phan products redux
-                dispatch(addProduct(response.data));
             } catch (error) {
                 console.log(error);
             }

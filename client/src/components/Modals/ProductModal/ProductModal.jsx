@@ -1,14 +1,16 @@
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import classNames from "classnames/bind";
 import { useDispatch, useSelector } from "react-redux";
+
+import * as productService from "../../../service/productService";
 
 import Modal from "../Modal/Modal";
 import Button from "../../Button/Button";
 import styles from "./ProductModal.module.scss";
-import * as productService from "../../../service/productService";
 import FormInfo from "./ProductDetail/FormDetail";
 import FormImage from "./ProductImage/FormImage";
+
 import {
     selectProduct,
     selectProductImage,
@@ -17,14 +19,12 @@ import {
     selectIsClearForm,
     selectActionBtnTitle,
 } from "../../../redux/selector";
-
 import { addReload, addClearForm } from "../../../redux/Slice/globalSlice";
 
 const cx = classNames.bind(styles);
 
 function ProductModal() {
     const [tab, setTab] = useState("info");
-    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
 
     const productImageFiles = useSelector(selectProductImageFile);
@@ -72,7 +72,6 @@ function ProductModal() {
         try {
             const response = await productService.createProduct(productData);
             if (response === "success") {
-                setLoading(!loading);
                 dispatch(addReload(!reload));
                 dispatch(addClearForm(!isClearForm));
             }
@@ -92,7 +91,6 @@ function ProductModal() {
                 }
             );
             if (response === "success") {
-                setLoading(!loading);
                 dispatch(addReload(!reload));
             }
         } catch (error) {

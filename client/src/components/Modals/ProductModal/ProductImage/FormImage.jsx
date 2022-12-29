@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import classNames from "classnames/bind";
-
-import styles from "./FormImage.module.scss";
-import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
+
+import styles from "./FormImage.module.scss";
+import config from "../../../../config";
 
 import {
     addProductImage,
@@ -14,7 +15,6 @@ import {
     selectProductImage,
     selectIsClearForm,
 } from "../../../../redux/selector";
-import config from "../../../../config";
 
 const cx = classNames.bind(styles);
 function FormImage({ className }) {

@@ -22,9 +22,9 @@ function CategoryModal({ className }) {
     const dispatch = useDispatch();
     const reload = useSelector(selectReload);
     const categoryGroups = useSelector(selectCategoryGroup);
-    const categoryUpdate = useSelector(selectCategory);
+    const categoryRedux = useSelector(selectCategory);
     let actionBtnTitle = useSelector(selectActionBtnTitle);
-    const { id, fk_category_group_id, category_title } = categoryUpdate;
+    const { id, fk_category_group_id, category_title } = categoryRedux;
 
     const [category, setCategory] = useState({
         categoryGroupId: "",
@@ -60,13 +60,13 @@ function CategoryModal({ className }) {
         }
     };
     useEffect(() => {
-        if (categoryUpdate) {
+        if (categoryRedux) {
             setCategory({
                 categoryGroupId: fk_category_group_id,
                 categoryTitle: category_title,
             });
         }
-    }, [categoryUpdate]);
+    }, [categoryRedux]);
     return (
         <Modal className={cx("wrapper")} title="Category">
             <div className={cx("content")}>

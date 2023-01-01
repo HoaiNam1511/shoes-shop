@@ -105,7 +105,7 @@ const getAllProduct = async (req, res) => {
                 ],
                 offset: offSet,
                 limit: ITEM_PER_PAGE,
-                include: [{ model: Product_image }],
+                include: [{ model: Product_image, as: "product_images" }],
                 order: [["id", "DESC"]],
             });
             const totalPage = await Math.ceil(products.count / ITEM_PER_PAGE);
@@ -131,7 +131,7 @@ const getAllProduct = async (req, res) => {
                     "fk_category_collection_id",
                     "fk_category_material_id",
                 ],
-                include: [{ model: Product_image }],
+                include: [{ model: Product_image, as: "product_images" }],
                 order: [["id", "DESC"]],
             });
             res.send({

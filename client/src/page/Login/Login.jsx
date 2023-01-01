@@ -18,6 +18,7 @@ function Login() {
         userName: "",
         password: "",
     });
+    const [message, setMessage] = useState("");
     const navigate = useNavigate();
     const { userName, password } = user;
     const handleInputOnChange = (e) => {
@@ -30,6 +31,7 @@ function Login() {
                 Cookies.set("token", result.token, { expires: 1 });
                 navigate("/");
             }
+            setMessage(result.message);
         } catch (error) {
             console.log(error);
         }

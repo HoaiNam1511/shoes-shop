@@ -34,7 +34,6 @@ function User() {
             try {
                 const response = await userService.getUser(page);
                 setUsers(response.data);
-                console.log(response.data);
                 setPageCount(response.totalPage);
             } catch (error) {
                 console.log(error);
@@ -89,8 +88,10 @@ function User() {
                             <td>{user.id}</td>
                             <td>{user.user_name}</td>
                             <td>{user.email}</td>
-                            <td>Admin</td>
-                            <td>{user.status}</td>
+                            <td>{user.role[0].name}</td>
+                            <td>
+                                {user.status === "1" ? "Enable" : "Disable"}
+                            </td>
                             <td>
                                 <ActionButton
                                     type="delete"

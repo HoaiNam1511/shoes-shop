@@ -4,7 +4,7 @@ import classNames from "classnames/bind";
 import { useDispatch, useSelector } from "react-redux";
 
 import styles from "./FormDetail.module.scss";
-
+import { productsSex } from "../../../../data/index";
 import {
     selectCategory,
     selectProduct,
@@ -41,23 +41,7 @@ function FormInfo({ className }) {
         categoryCollectionId,
         categoryMaterialId,
     } = product;
-    const productsSex = [
-        {
-            id: 1,
-            value: "male",
-            title: "Male",
-        },
-        {
-            id: 2,
-            value: "female",
-            title: "FeMale",
-        },
-        {
-            id: 3,
-            value: "unique",
-            title: "Unique",
-        },
-    ];
+
     // Clear form after add
     useEffect(() => {
         setProduct({

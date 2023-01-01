@@ -11,6 +11,7 @@ import Button from "../../Button/Button";
 import { selectReload, selectActionBtnTitle } from "../../../redux/selector";
 import { addReload } from "../../../redux/Slice/globalSlice";
 import { selectUser } from "../../../redux/selector";
+import { accountStatus } from "../../../data/";
 
 const cx = classNames.bind(styles);
 function UserModal({ className }) {
@@ -28,36 +29,27 @@ function UserModal({ className }) {
         role: "",
     });
     const { id, email, useName, password, status, role } = user;
-    const accountStatus = [
-        {
-            id: 1,
-            title: "Enable",
-            status: true,
-        },
-        {
-            id: 2,
-            title: "Disable",
-            status: false,
-        },
-    ];
+
     useEffect(() => {
-        setUser({
-            id: userRedux.id,
-            email: userRedux.email,
-            useName: userRedux.user_name,
-            password: userRedux.password,
-            status: userRedux.status,
-            role: "",
-        });
+        if (userRedux.id) {
+            setUser({
+                id: userRedux.id,
+                email: userRedux.email,
+                useName: userRedux.user_name,
+                password: userRedux.password,
+                status: userRedux.status,
+                role: userRedux.role[0].User_role.RoleId,
+            });
+        }
     }, [userRedux]);
     useEffect(() => {
         const result = async () => {
             try {
-                const response = await userService.getRole();
-                setRoles(response);
+                const roles = await userService.getRole();
+                setRoles(roles);
                 setUser({
                     ...user,
-                    role: response[0].id,
+                    role: roles[0].id,
                     status: accountStatus[0].status,
                 });
             } catch (error) {
@@ -66,10 +58,16 @@ function UserModal({ className }) {
         };
         result();
     }, []);
-
+    console.log(user);
     const handleValueChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
+    const handleKeyDown = (e) => {
+        if (e.key === " ") {
+            e.preventDefault();
+        }
+    };
+
     const handleAddUser = async () => {
         try {
             await userService.createUser(user);
@@ -78,7 +76,6 @@ function UserModal({ className }) {
             console.log(error);
         }
     };
-
     const handleUpdateUser = async () => {
         try {
             await userService.updateUser(id, user);
@@ -100,6 +97,7 @@ function UserModal({ className }) {
                         value={email}
                         name="email"
                         onChange={handleValueChange}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
                 <div className={cx("form-group")}>
@@ -111,6 +109,7 @@ function UserModal({ className }) {
                         value={useName}
                         name="useName"
                         onChange={handleValueChange}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
                 <div className={cx("form-group")}>
@@ -122,6 +121,7 @@ function UserModal({ className }) {
                         value={password}
                         name="password"
                         onChange={handleValueChange}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
 
@@ -134,7 +134,7 @@ function UserModal({ className }) {
                         onChange={handleValueChange}
                     >
                         {accountStatus.map((status) => (
-                            <option key={status.id} value={status.id}>
+                            <option key={status.id} value={status.status}>
                                 {status.title}
                             </option>
                         ))}

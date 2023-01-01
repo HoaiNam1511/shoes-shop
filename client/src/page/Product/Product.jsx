@@ -111,10 +111,10 @@ function Product() {
                             <td>{product.id}</td>
                             {/* Xem lai phan nay */}
                             <td style={{ display: "flex" }}>
-                                {product.Product_images[0] && (
+                                {product.product_images[0] && (
                                     <img
                                         className={cx("image")}
-                                        src={`${config.url.URL_STATIC_FILE}${product.Product_images[0].image}`}
+                                        src={`${config.url.URL_STATIC_FILE}${product.product_images[0].image}`}
                                         alt=""
                                     />
                                 )}

@@ -1,8 +1,7 @@
-const User = require("../models/users");
-const User_role = require("../models/userRoles");
-const Role = require("../models/roles");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const { User, User_role, Role } = require("../models/users");
+const { use } = require("../routers/user");
 
 const ITEM_PER_PAGE = 10;
 const secretKey = process.env.SECRET_KEY;
@@ -16,16 +15,23 @@ const login = async (req, res, next) => {
             },
         });
         if (user) {
-            let token = jwt.sign(
-                {
-                    id: user.id,
-                },
-                secretKey,
-                { expiresIn: "1h" }
-            );
+            let token;
+            let message;
+            if (user.status == 1) {
+                token = jwt.sign(
+                    {
+                        id: user.id,
+                    },
+                    secretKey,
+                    { expiresIn: "1h" }
+                );
+                message = "Login success";
+            } else {
+                message = "Account is disable";
+            }
             res.send({
                 token: token,
-                message: "Login success",
+                message: message,
             });
         } else {
             console.log("Login false");
@@ -35,26 +41,75 @@ const login = async (req, res, next) => {
     }
 };
 
-const checkLogin = (req, res, next) => {
-    // const token = req.body.token;
-    // const { id } = jwt.verify(token, secretKey);
-    // console.log(token);
-    // User.findOne({
-    //     where: {
-    //         id: id,
-    //     },
-    // })
-    //     .then((user) => {
-    //         if (user) {
-    //             req.data = user;
-    //             next();
-    //         } else {
-    //             res.send("Please login");
-    //         }
-    //     })
-    //     .catch((error) => {
-    //         console.log(error);
-    //     });
+const checkLogin = async (req, res, next) => {
+    const token = req.cookies.token;
+    const { id } = jwt.verify(token, secretKey);
+    console.log(token);
+    const user = await User.findOne({
+        where: {
+            id: id,
+        },
+    });
+
+    try {
+        if (user.id) {
+            req.data = user;
+            next();
+        } else {
+            res.send("/login");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+const getUSer = async (req, res, next) => {
+    let { page } = req.query;
+    if (page) {
+        let offSet = (page - 1) * ITEM_PER_PAGE;
+        try {
+            const result = await User.findAndCountAll({
+                attributes: ["id", "email", "user_name", "password", "status"],
+                include: [
+                    {
+                        model: Role,
+                        attributes: ["name", "description"],
+                        as: "role",
+                    },
+                ],
+                offset: offSet,
+                limit: ITEM_PER_PAGE,
+                required: false,
+            });
+            const totalPage = await Math.ceil(result.count / ITEM_PER_PAGE);
+            res.send({
+                totalPage: totalPage,
+                data: result.rows,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
+        try {
+            const result = await User.findAndCountAll({
+                attributes: ["id", "email", "user_name", "password", "status"],
+                include: [
+                    {
+                        model: Role,
+                        attributes: ["name", "description"],
+                        as: "role",
+                    },
+                ],
+                required: false,
+            });
+            const totalPage = await Math.ceil(result.count / ITEM_PER_PAGE);
+            res.send({
+                totalPage: totalPage,
+                data: result.rows,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
 };
 
 const getRole = async (req, res, next) => {
@@ -92,39 +147,12 @@ const createUser = async (req, res, next) => {
     console.log(role);
     try {
         await User_role.create({
-            fk_user_id: user.id,
-            fk_role_id: role,
+            UserId: user.id,
+            RoleId: role,
         });
         res.send("success");
     } catch (error) {
         console.log(error);
-    }
-};
-const getUSer = async (req, res, next) => {
-    let { page } = req.query;
-    if (page) {
-        let offSet = (page - 1) * ITEM_PER_PAGE;
-        try {
-            const result = await User.findAndCountAll({
-                // include: [
-                //     {
-                //         model: User_role,
-                //         as: "use_role",
-                //         include: [{ model: Role, as: "role" }],
-                //     },
-                // ],
-                offset: offSet,
-                limit: ITEM_PER_PAGE,
-                required: false,
-            });
-            const totalPage = await Math.ceil(result.count / ITEM_PER_PAGE);
-            res.send({
-                totalPage: totalPage,
-                data: result.rows,
-            });
-        } catch (error) {
-            console.log(error);
-        }
     }
 };
 
@@ -148,11 +176,11 @@ const updateUser = async (req, res, next) => {
 
         await User_role.update(
             {
-                fk_role_id: role,
+                RoleId: role,
             },
             {
                 where: {
-                    fk_user_id: id,
+                    UserId: id,
                 },
             }
         );
@@ -174,7 +202,7 @@ const deleteUser = async (req, res, next) => {
 
         await User_role.destroy({
             where: {
-                fk_user_id: id,
+                UserId: id,
             },
         });
         res.send("delete");

@@ -50,6 +50,12 @@ const Product = db.define(
     },
     {}
 );
-Product.hasMany(Product_image, { foreignKey: "fk_product_id" });
-Product_image.belongsTo(Product, { foreignKey: "fk_product_id" });
+Product.hasMany(Product_image, {
+    foreignKey: "fk_product_id",
+    as: "product_images",
+});
+Product_image.belongsTo(Product, {
+    foreignKey: "fk_product_id",
+    as: "product_images",
+});
 module.exports = Product;

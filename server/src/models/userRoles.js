@@ -1,20 +1,22 @@
-const Sequelize = require("sequelize");
-const db = require("../config/connectDB");
-const User = require("./users");
-const Role = require("./roles");
-const User_role = db.define("User_role", {
-    fk_user_id: {
-        type: Sequelize.INTEGER(10),
-        allowNull: false,
-        primaryKey: true,
-    },
-    fk_role_id: {
-        type: Sequelize.INTEGER(10),
-        allowNull: false,
-    },
-});
+// const Sequelize = require("sequelize");
+// const { DataTypes } = require("sequelize");
+// const db = require("../config/connectDB");
 
-User_role.hasOne(Role, { as: "role", foreignKey: "id" });
-Role.belongsTo(User_role, { as: "role", foreignKey: "id" });
+// const User_role = db.define("User_role", {
+//     UserId: {
+//         type: DataTypes.INTEGER,
+//         references: {
+//             model: user.User, // 'Movies' would also work
+//             key: "id",
+//         },
+//     },
+//     RoleId: {
+//         type: DataTypes.INTEGER,
+//         references: {
+//             model: role.Role, // 'Actors' would also work
+//             key: "id",
+//         },
+//     },
+// });
 
-module.exports = User_role;
+// module.exports = User_role;

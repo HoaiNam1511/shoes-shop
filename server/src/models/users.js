@@ -1,9 +1,10 @@
 const Sequelize = require("sequelize");
 const db = require("../config/connectDB");
-const User_role = require("./userRoles");
+const { DataTypes } = require("sequelize");
+
 const User = db.define("User", {
     id: {
-        type: Sequelize.INTEGER(10),
+        type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
@@ -25,6 +26,46 @@ const User = db.define("User", {
         allowNull: false,
     },
 });
-User.hasOne(User_role, { as: "use_role", foreignKey: "fk_user_id" });
-User_role.belongsTo(User, { as: "use_role", foreignKey: "fk_user_id" });
-module.exports = User;
+
+const Role = db.define("Role", {
+    id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    description: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+});
+
+const User_role = db.define("User_role", {
+    UserId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: User,
+            key: "id",
+        },
+    },
+    RoleId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Role,
+            key: "id",
+        },
+    },
+});
+
+Role.belongsToMany(User, { through: User_role, as: "role" });
+User.belongsToMany(Role, { through: User_role, as: "role" });
+
+module.exports = {
+    User,
+    Role,
+    User_role,
+};

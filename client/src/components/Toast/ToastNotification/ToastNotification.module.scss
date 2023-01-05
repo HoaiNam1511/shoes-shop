@@ -1,0 +1,83 @@
+$add-color: #0ebe30;
+$warning-color:#e8be0d;
+$delete-color: #e64c45;
+$update-color:#3698d9;
+$notification-width: 319px;
+$notification-right: 10px;
+
+.wrapper {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    width: $notification-width;
+    height: 68px;
+    background-color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    display: flex;
+    align-items: center;
+    transform: translateX(100%);
+    transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+    z-index: 2;
+}
+.wrapper.active {
+    transform: translateX(-10px);
+}
+
+.icon-container {
+    width: 20%;
+    transform: translateY(50%);
+}
+
+.content {
+
+}
+
+.action {
+    text-transform: capitalize;
+}
+
+.message {
+
+}
+
+.wrapper  {
+    .icon {
+        font-size: 3.5rem;
+        transform: translateY(-50%);
+        margin-left: 10px;
+    }
+}
+
+.add {
+    .icon {
+        color:$add-color;
+    }
+}
+
+.update {
+    .icon {
+        color:$update-color;
+    }
+}
+
+.delete {
+    .icon {
+        color:$delete-color;
+    }
+}
+
+.warning {
+    .icon {
+        color: $warning-color;
+    }
+}
+
+@keyframes slidein {
+    from {
+        //right: calc($notification-width * -1);
+    }
+    to {    
+        //right: $notification-right;
+
+    }
+  }

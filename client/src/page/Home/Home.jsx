@@ -1,12 +1,10 @@
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
 import styles from "./Home.module.scss";
 import classNames from "classnames/bind";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+
 const cx = classNames.bind(styles);
 function Home() {
-    return <div>Home</div>;
+    return <div></div>;
 }
 
 export default Home;

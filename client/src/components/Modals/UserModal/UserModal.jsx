@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import classNames from "classnames/bind";
 
 import * as userService from "../../../service/userService";
+import * as authService from "../../../service/authService";
 
 import styles from "./UserModal.module.scss";
 import Modal from "../Modal/Modal";
@@ -12,6 +13,9 @@ import { selectReload, selectActionBtnTitle } from "../../../redux/selector";
 import { addReload } from "../../../redux/Slice/globalSlice";
 import { selectUser } from "../../../redux/selector";
 import { accountStatus } from "../../../data/";
+import { selectCurrentUser } from "../../../redux/selector";
+import { axiosCreateJWT } from "../../../util/jwtRequest";
+import { loginSuccess } from "../../../redux/Slice/auth";
 
 const cx = classNames.bind(styles);
 function UserModal({ className }) {
@@ -20,6 +24,7 @@ function UserModal({ className }) {
     const reload = useSelector(selectReload);
     const actionButtonTitle = useSelector(selectActionBtnTitle);
     const userRedux = useSelector(selectUser);
+    const currentUser = useSelector(selectCurrentUser);
     const [user, setUser] = useState({
         id: "",
         email: "",
@@ -45,7 +50,7 @@ function UserModal({ className }) {
     useEffect(() => {
         const result = async () => {
             try {
-                const roles = await userService.getRole();
+                const roles = await authService.getRole();
                 setRoles(roles);
                 setUser({
                     ...user,
@@ -58,7 +63,6 @@ function UserModal({ className }) {
         };
         result();
     }, []);
-    console.log(user);
     const handleValueChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
@@ -70,7 +74,13 @@ function UserModal({ className }) {
 
     const handleAddUser = async () => {
         try {
-            await userService.createUser(user);
+            await userService.createUser(
+                user,
+                {
+                    headers: { token: currentUser?.token },
+                },
+                axiosCreateJWT(currentUser, dispatch, loginSuccess)
+            );
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
@@ -78,7 +88,14 @@ function UserModal({ className }) {
     };
     const handleUpdateUser = async () => {
         try {
-            await userService.updateUser(id, user);
+            await userService.updateUser(
+                id,
+                user,
+                {
+                    headers: { token: currentUser?.token },
+                },
+                axiosCreateJWT(currentUser, dispatch, loginSuccess)
+            );
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);

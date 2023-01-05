@@ -13,5 +13,8 @@ export const selectActionBtnTitle = (state) =>
 export const selectModalShow = (state) => state.globalReducer.modalStatus;
 export const selectReload = (state) => state.globalReducer.reload;
 export const selectIsClearForm = (state) => state.globalReducer.isClearForm;
+export const selectToastIsActive = (state) => state.globalReducer.toastIsActive;
 //User
 export const selectUser = (state) => state.userReducer.user;
+//Auth
+export const selectCurrentUser = (state) => state.authReducer.login.currentUser;

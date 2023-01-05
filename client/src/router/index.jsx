@@ -32,10 +32,10 @@ const router = [
         component: User,
         layout: MainLayout,
     },
-    {
-        path: config.routes.login,
-        component: Login,
-        layout: null,
-    },
+    // {
+    //     path: config.routes.login,
+    //     component: Login,
+    //     layout: null,
+    // },
 ];
 export default router;

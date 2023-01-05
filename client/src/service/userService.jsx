@@ -1,30 +1,21 @@
 import * as request from "../util/httpRequest";
-export const login = async (user) => {
-    const result = await request.postRequest("user/login", user);
+
+export const getUser = async (page, headers, axiosJWT) => {
+    const result = await axiosJWT.get(`user/get?page=${page}`, headers);
     return result.data;
 };
 
-export const getUser = async (page) => {
-    const result = await request.getRequest(`user/get?page=${page}`);
+export const createUser = async (user, headers, axiosJWT) => {
+    const result = await axiosJWT.post("user/create", user, headers);
     return result.data;
 };
 
-export const getRole = async () => {
-    const result = await request.getRequest("user/role");
+export const updateUser = async (id, user, axiosJWT) => {
+    const result = await axiosJWT.put(`user/update/${id}`, user);
     return result.data;
 };
 
-export const createUser = async (user) => {
-    const result = await request.postRequest("user/create", user);
-    return result.data;
-};
-
-export const updateUser = async (id, user) => {
-    const result = await request.putRequest(`user/update/${id}`, user);
-    return result.data;
-};
-
-export const deleteUser = async (id) => {
-    const result = await request.deleteRequest(`user/delete/${id}`);
+export const deleteUser = async (id, headers, axiosJWT) => {
+    const result = await axiosJWT.delete(`user/delete/${id}`, headers);
     return result.data;
 };

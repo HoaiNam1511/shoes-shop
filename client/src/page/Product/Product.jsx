@@ -25,17 +25,18 @@ import {
     addModalStatus,
     addReload,
 } from "../../redux/Slice/globalSlice";
-
-import { selectReload } from "../../redux/selector";
+import { axiosCreateJWT } from "../../util/jwtRequest";
+import { selectCurrentUser, selectReload } from "../../redux/selector";
+import { loginSuccess } from "../../redux/Slice/auth";
 
 const cx = classNames.bind(styles);
 function Product() {
-    console.log("come product");
     const dispatch = useDispatch();
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [pageCount, setPageCount] = useState(0);
     const reload = useSelector(selectReload);
+    const currentUser = useSelector(selectCurrentUser);
     //Get category
     useEffect(() => {
         const result = async () => {
@@ -62,29 +63,32 @@ function Product() {
         result();
     }, [dispatch, reload, page]);
 
-    const handleDeleteProduct = async (id) => {
-        const result = async () => {
-            try {
-                await productService.deleteProduct(id);
-                dispatch(addReload(!reload));
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        result();
+    const handleAddProduct = () => {
+        dispatch(addActionBtnTitle("add"));
+        dispatch(addModalStatus(true));
     };
-
     const handleUpdateProduct = (product) => {
-        let productImage = product.Product_images;
+        let productImage = product.product_images;
         dispatch(addActionBtnTitle("update"));
         dispatch(addProductImage(productImage));
         dispatch(addProductInfo(product));
         dispatch(addModalStatus(true));
     };
-    const handleAddProduct = () => {
-        dispatch(addActionBtnTitle("add"));
-        dispatch(addModalStatus(true));
+    const handleDeleteProduct = async (id) => {
+        try {
+            await productService.deleteProduct(
+                id,
+                {
+                    headers: { token: currentUser?.token },
+                },
+                axiosCreateJWT(currentUser, dispatch, loginSuccess)
+            );
+            dispatch(addReload(!reload));
+        } catch (error) {
+            console.log(error);
+        }
     };
+
     return (
         <div>
             <Button

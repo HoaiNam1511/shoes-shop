@@ -1,16 +1,18 @@
 import { useState } from "react";
-import Cookies from "js-cookie";
 import styles from "./Login.module.scss";
 import classNames from "classnames/bind";
 import { useNavigate } from "react-router-dom";
-import * as userService from "../../service/userService";
+import * as authService from "../../service/authService";
+import { useDispatch } from "react-redux";
 
-import backgroundImage from "../../asset/background/login-background.jpg";
-import logo from "../../asset/background/logo.png";
 import PersonIcon from "@mui/icons-material/Person";
+import logo from "../../asset/background/logo.png";
 import HttpsIcon from "@mui/icons-material/Https";
 
+import backgroundImage from "../../asset/background/login-background.jpg";
 import Button from "../../components/Button/Button";
+import ToastLogin from "../../components/Toast/ToastLogin/ToastLogin";
+import { loginStart, loginSuccess, loginFail } from "../../redux/Slice/auth";
 
 const cx = classNames.bind(styles);
 function Login() {
@@ -19,22 +21,36 @@ function Login() {
         password: "",
     });
     const [message, setMessage] = useState("");
+    const [action, setAction] = useState("");
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { userName, password } = user;
     const handleInputOnChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
     const handleLogin = async () => {
+        dispatch(loginStart());
         try {
-            const result = await userService.login(user);
-            if (result.token) {
-                Cookies.set("token", result.token, { expires: 1 });
+            const result = await authService.login(user);
+            if (result.data?.token) {
+                dispatch(loginSuccess(result?.data));
                 navigate("/");
             }
-            setMessage(result.message);
+            setMessage(result.data.message);
+            setAction(result.data.action);
         } catch (error) {
             console.log(error);
+            dispatch(loginFail());
         }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === " ") {
+            e.preventDefault();
+        }
+    };
+    const handleCloseToast = () => {
+        setAction(null);
     };
     return (
         <>
@@ -55,17 +71,19 @@ function Login() {
                             name="userName"
                             value={userName}
                             onChange={handleInputOnChange}
+                            onKeyDown={handleKeyDown}
                             placeholder="User name"
                         />
                     </div>
                     <div className={cx("input-container")}>
-                        <HttpsIcon className={cx("icon")} />
+                        <HttpsIcon className={cx("icon-input")} />
                         <input
                             className={cx("input")}
-                            type="text"
+                            type="password"
                             name="password"
                             value={password}
                             onChange={handleInputOnChange}
+                            onKeyDown={handleKeyDown}
                             placeholder="Password"
                         />
                     </div>
@@ -73,6 +91,14 @@ function Login() {
                     <Button className={cx("btn-login")} onClick={handleLogin}>
                         Login
                     </Button>
+                    {action && (
+                        <ToastLogin
+                            // className={cx(action)}
+                            onClick={handleCloseToast}
+                            action={action}
+                            message={message}
+                        />
+                    )}
                 </div>
             </div>
         </>

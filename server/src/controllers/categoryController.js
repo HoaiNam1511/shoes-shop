@@ -68,7 +68,10 @@ const createCategory = async (req, res) => {
             fk_category_group_id: categoryGroupId,
             category_title: categoryTitle,
         });
-        res.send("created");
+        res.send({
+            message: "Add category success",
+            action: "add",
+        });
     } catch (error) {
         console.log(error);
     }
@@ -78,7 +81,7 @@ const updateCategory = async (req, res) => {
     const { categoryTitle, categoryGroupId } = req.body;
     const id = req.params.id;
     try {
-        const categorys = await Category.update(
+        await Category.update(
             {
                 fk_category_group_id: categoryGroupId,
                 category_title: categoryTitle,
@@ -89,7 +92,10 @@ const updateCategory = async (req, res) => {
                 },
             }
         );
-        res.send("updated");
+        res.send({
+            message: "Update category success",
+            action: "update",
+        });
     } catch (error) {
         console.log(error);
     }
@@ -103,7 +109,10 @@ const deleteCategory = async (req, res) => {
                 id: id,
             },
         });
-        res.send("deleted");
+        res.send({
+            message: "Delete category success",
+            action: "delete",
+        });
     } catch (error) {
         console.log(error);
     }

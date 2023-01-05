@@ -18,8 +18,11 @@ import {
     selectProductImageFile,
     selectIsClearForm,
     selectActionBtnTitle,
+    selectCurrentUser,
 } from "../../../redux/selector";
 import { addReload, addClearForm } from "../../../redux/Slice/globalSlice";
+import { axiosCreateJWT } from "../../../util/jwtRequest";
+import { loginSuccess } from "../../../redux/Slice/auth";
 
 const cx = classNames.bind(styles);
 
@@ -32,6 +35,7 @@ function ProductModal() {
     const productStatus = useSelector(selectActionBtnTitle);
     const isClearForm = useSelector(selectIsClearForm);
     const reload = useSelector(selectReload);
+    const currentUser = useSelector(selectCurrentUser);
     let productData = new FormData();
     const {
         productId,
@@ -67,10 +71,17 @@ function ProductModal() {
         productData.append("categoryCollectionId", categoryCollectionId);
         productData.append("categoryMaterialId", categoryMaterialId);
     };
+
     const handleAddProduct = async () => {
         formDataFunc();
         try {
-            const response = await productService.createProduct(productData);
+            const response = await productService.createProduct(
+                productData,
+                {
+                    headers: { token: currentUser?.token },
+                },
+                axiosCreateJWT(currentUser, dispatch, loginSuccess)
+            );
             if (response === "success") {
                 dispatch(addReload(!reload));
                 dispatch(addClearForm(!isClearForm));
@@ -87,8 +98,12 @@ function ProductModal() {
                 productId,
                 productData,
                 {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        token: currentUser?.token,
+                    },
+                },
+                axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
             if (response === "success") {
                 dispatch(addReload(!reload));

@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddIcon from "@mui/icons-material/Add";
-
 import Button from "../../components/Button/Button";
 import ActionButton from "../../components/Button/ActionButton/ActionButton";
 import Paginate from "../../components/Paginate/Paginate";
 
 import * as userService from "../../service/userService";
+import * as authService from "../../service/authService";
 import styles from "./User.module.scss";
 import classNames from "classnames/bind";
 
@@ -19,7 +19,13 @@ import {
     addReload,
 } from "../../redux/Slice/globalSlice";
 import { addUser } from "../../redux/Slice/userSlice";
-import { selectModalShow, selectReload } from "../../redux/selector";
+import {
+    selectModalShow,
+    selectReload,
+    selectCurrentUser,
+} from "../../redux/selector";
+import { loginSuccess } from "../../redux/Slice/auth";
+import { axiosCreateJWT } from "../../util/jwtRequest";
 
 const cx = classNames.bind(styles);
 function User() {
@@ -29,18 +35,7 @@ function User() {
     const [users, setUsers] = useState([]);
     const modalStatus = useSelector(selectModalShow);
     const reload = useSelector(selectReload);
-    useEffect(() => {
-        const result = async () => {
-            try {
-                const response = await userService.getUser(page);
-                setUsers(response.data);
-                setPageCount(response.totalPage);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        result();
-    }, [page, reload]);
+    const currentUser = useSelector(selectCurrentUser);
 
     const handleAddUser = () => {
         dispatch(addActionBtnTitle("add"));
@@ -54,12 +49,37 @@ function User() {
 
     const handleDeleteUser = async (id) => {
         try {
-            await userService.deleteUser(id);
+            await userService.deleteUser(
+                id,
+                {
+                    headers: { token: currentUser?.token },
+                },
+                axiosCreateJWT(currentUser, dispatch, loginSuccess)
+            );
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
         }
     };
+
+    useEffect(() => {
+        const result = async () => {
+            try {
+                const response = await userService.getUser(
+                    page,
+                    {
+                        headers: { token: currentUser?.token },
+                    },
+                    axiosCreateJWT(currentUser, dispatch, loginSuccess)
+                );
+                setUsers(response.data);
+                setPageCount(response.totalPage);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        result();
+    }, [page, reload]);
 
     return (
         <div>
@@ -83,7 +103,7 @@ function User() {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user) => (
+                    {users?.map((user) => (
                         <tr key={user.id}>
                             <td>{user.id}</td>
                             <td>{user.user_name}</td>

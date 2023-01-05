@@ -1,0 +1,41 @@
+@import '../../../components/GlobalStyle/GlobalStyle.scss';
+.wrapper {
+    height: 57px;
+    width: calc(100% - 80px);
+    position: absolute;
+    top: 210px;
+    padding: 4px;
+    .title {
+        font-family: $font-family;
+        color: #6b6b6b;
+        font-weight: 400;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2; /* number of lines to show */
+        line-height: 1.5;        /* fallback */
+    }
+    .action {
+        font-weight: 700;
+    } 
+}
+.warning {
+    background-color: #ffffe0;
+    border: 1px solid #eae27b;
+}
+.error {
+    background-color: #ffebe8;
+    border: 1px solid #db4746;
+}
+.close {
+    background-color: transparent;
+    border: none;
+    position: absolute;
+    right: 2px;
+    top:-1px;
+    padding: 0 2px;
+    &:hover {
+        cursor: pointer;
+    }
+}

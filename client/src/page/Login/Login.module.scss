@@ -1,4 +1,5 @@
 @import '../../components/GlobalStyle/GlobalStyle.scss';
+$padding-content: 40px;
 .background-img {
     height: calc(100vh);
     width: 100%;
@@ -30,7 +31,11 @@
 }
 .user-wrap {
     width: 100%;
-    padding: 25px 39px;
+    padding: 33px $padding-content 25px;
+    .icon-input {
+        font-size: 2.2rem;
+        color:#424242;
+    }
 }
 .input-container {
     display: flex;
@@ -39,10 +44,7 @@
     border-color: transparent transparent $primary transparent;
 }
 
-.icon-input {
-    font-size: 2.2rem;
-    color:#424242;
-}
+
 .input {
     flex: 1;
     height: 35px;

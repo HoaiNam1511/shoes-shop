@@ -9,19 +9,19 @@ export const getProduct = async (page) => {
     }
     return result.data;
 };
-export const createProduct = async (product, option) => {
-    const response = await request.postRequest(
-        "product/create",
+export const createProduct = async (product, headers, axiosJWT) => {
+    const response = await axiosJWT.post("product/create", product, headers);
+    return response.data;
+};
+export const deleteProduct = async (id, headers, axiosJWT) => {
+    const response = await axiosJWT.delete(`product/delete/${id}`, headers);
+    return response.data;
+};
+export const updateProduct = async (id, product, headers, axiosJWT) => {
+    const response = await axiosJWT.put(
+        `product/update/${id}`,
         product,
-        option
+        headers
     );
-    return response.data;
-};
-export const deleteProduct = async (id) => {
-    const response = await request.deleteRequest(`product/delete/${id}`);
-    return response.data;
-};
-export const updateProduct = async (id, product) => {
-    const response = await request.putRequest(`product/update/${id}`, product);
     return response.data;
 };

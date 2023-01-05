@@ -1,12 +1,13 @@
 import MainLayout from "./layout/MainLayout/MainLayout";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Fragment } from "react";
-import Product from "./page/Product/Product";
 import router from "./router";
+import Login from "./page/Login/Login";
 function App() {
     return (
         <Router>
             <Routes>
+                <Route path={"/login"} element={<Login></Login>}></Route>
                 {router.map((route, index) => {
                     let Layout = MainLayout;
                     if (route.layout === null) {

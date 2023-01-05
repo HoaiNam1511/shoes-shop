@@ -19,10 +19,18 @@ import {
     addReload,
     addModalStatus,
     addActionBtnTitle,
+    addToastIsActive,
 } from "../../redux/Slice/globalSlice";
-import { selectReload, selectModalShow } from "../../redux/selector";
+import {
+    selectReload,
+    selectModalShow,
+    selectCurrentUser,
+    selectToastIsActive,
+} from "../../redux/selector";
+import { axiosCreateJWT } from "../../util/jwtRequest";
+import { loginSuccess } from "../../redux/Slice/auth";
+import ToastNotification from "../../components/Toast/ToastNotification/ToastNotification";
 
-import useAuth from "../../hooks/useAuth";
 const cx = classNames.bind(styles);
 
 function Category() {
@@ -30,16 +38,13 @@ function Category() {
     const dispatch = useDispatch();
     const [categorys, setCategorys] = useState([]);
     const [pageCount, setPageCount] = useState(0);
+    const [notification, setNotification] = useState({});
     const [page, setPage] = useState(1);
     const reload = useSelector(selectReload);
     const modalStatus = useSelector(selectModalShow);
-    // const auth = useAuth();
-    // const loader = async () => {
-    //     if (!auth) {
-    //         navigate("/login");
-    //     }
-    // };
-    // loader();
+    const currentUser = useSelector(selectCurrentUser);
+    const toastIsActive = useSelector(selectToastIsActive);
+
     const handleAddProduct = () => {
         dispatch(addActionBtnTitle("add"));
         dispatch(addModalStatus(!modalStatus));
@@ -73,8 +78,16 @@ function Category() {
     const handleDeleteCategory = (id) => {
         const result = async () => {
             try {
-                await categoryService.deleteCategory(id);
+                const result = await categoryService.deleteCategory(
+                    id,
+                    {
+                        headers: { token: currentUser?.token },
+                    },
+                    axiosCreateJWT(currentUser, dispatch, loginSuccess)
+                );
+                setNotification(result);
                 dispatch(addReload(!reload));
+                dispatch(addToastIsActive(!toastIsActive));
             } catch (error) {
                 console.log(error);
             }
@@ -86,8 +99,13 @@ function Category() {
         dispatch(addCategory(category));
         dispatch(addModalStatus(!modalStatus));
     };
+
     return (
         <div>
+            <ToastNotification
+                action={notification.action}
+                message={notification.message}
+            />
             <Button
                 onClick={handleAddProduct}
                 leftIcon={<AddIcon fontSize="large" />}

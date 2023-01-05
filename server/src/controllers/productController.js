@@ -21,7 +21,6 @@ const createProduct = async (req, res) => {
         // } else {
         // }
         const imageArray = req.files;
-
         const {
             productName,
             productPrice,
@@ -45,7 +44,6 @@ const createProduct = async (req, res) => {
                 fk_category_collection_id: categoryCollectionId,
                 fk_category_material_id: categoryMaterialId,
             });
-            console.log("success");
         } catch (error) {
             console.log(error);
         }
@@ -62,7 +60,7 @@ const createProduct = async (req, res) => {
 
         //Cach 1
         const newArrayImg = imageArray.map((item) => ({
-            fk_product_id: productId,
+            fk_product_id: productId.id,
             image: item.filename,
         }));
 
@@ -88,7 +86,6 @@ const getAllProduct = async (req, res) => {
     let page = req.query.page;
     if (page) {
         let offSet = (page - 1) * ITEM_PER_PAGE;
-
         try {
             const products = await Product.findAndCountAll({
                 attributes: [
@@ -146,7 +143,6 @@ const getAllProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     upload(req, res, async function () {
         const { id } = req.params;
-        console.log(req.body);
         const {
             productName,
             productPrice,
@@ -169,7 +165,6 @@ const updateProduct = async (req, res) => {
             fk_product_id: id,
             image: item.image,
         }));
-
         const newArrayImg = [...imagesArr, ...imageFilesArr];
 
         try {
@@ -190,7 +185,6 @@ const updateProduct = async (req, res) => {
                     },
                 }
             );
-            console.log("updated");
         } catch (error) {
             console.log(error);
         }
@@ -201,7 +195,6 @@ const updateProduct = async (req, res) => {
                     fk_product_id: id,
                 },
             });
-            console.log("success");
         } catch (error) {
             console.log(error);
         }

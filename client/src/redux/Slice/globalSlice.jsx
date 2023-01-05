@@ -5,6 +5,7 @@ const initialState = {
     modalStatus: false,
     reload: false,
     isClearForm: false,
+    toastIsActive: false,
 };
 
 const globalSlice = createSlice({
@@ -23,11 +24,20 @@ const globalSlice = createSlice({
         addClearForm(state, action) {
             state.isClearForm = action.payload;
         },
+        addToastIsActive(state, action) {
+            state.toastIsActive = action.payload;
+        },
     },
 });
 
 //Export action
-export const { addActionBtnTitle, addModalStatus, addReload, addClearForm } =
-    globalSlice.actions;
+export const {
+    addActionBtnTitle,
+    addModalStatus,
+    addReload,
+    addClearForm,
+    addNotification,
+    addToastIsActive,
+} = globalSlice.actions;
 
 export default globalSlice;

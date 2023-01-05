@@ -19,30 +19,30 @@ import {
 const cx = classNames.bind(styles);
 function FormImage({ className }) {
     // console.log("form image");
+    const dispatch = useDispatch();
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
-    const dispatch = useDispatch();
 
     const productImage = useSelector(selectProductImage);
     const isClearForm = useSelector(selectIsClearForm);
-
-    //Update image when image delete
-    useEffect(() => {
-        setImages(productImage);
-    }, [productImage]);
-    //Dispatch to redux when image file change
-    useEffect(() => {
-        dispatch(addProductImageFile(imageFiles));
-    }, [dispatch, imageFiles]);
-
-    useEffect(() => {
-        dispatch(addProductImage(images));
-    }, [dispatch, images]);
 
     useEffect(() => {
         setImageFiles([]);
         setImages([]);
     }, [isClearForm]);
+
+    useEffect(() => {
+        dispatch(addProductImageFile(imageFiles));
+    }, [dispatch, imageFiles]);
+    useEffect(() => {
+        console.log("set images");
+        setImages(productImage);
+    }, []);
+    console.log(images);
+    useEffect(() => {
+        console.log("dispatch images");
+        dispatch(addProductImage(images));
+    }, [dispatch, images]);
 
     const handleUploadFile = (e) => {
         setImageFiles([...imageFiles, ...Array.from(e.target.files)]);

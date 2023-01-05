@@ -3,9 +3,13 @@ import styles from "./MainLayout.module.scss";
 import classNames from "classnames/bind";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Navbar from "../components/Navbar/Navbar";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../../redux/selector";
+import { Navigate } from "react-router-dom";
 const cx = classNames.bind(styles);
 function MainLayout({ children }) {
-    return (
+    const currentUser = useSelector(selectCurrentUser);
+    return currentUser?.token ? (
         <div className={cx("wrapper")}>
             <Sidebar></Sidebar>
             <div className={cx("main")}>
@@ -13,6 +17,8 @@ function MainLayout({ children }) {
                 <div className={cx("main-content")}>{children}</div>
             </div>
         </div>
+    ) : (
+        <Navigate to="/login"></Navigate>
     );
 }
 

@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { useCallback } from "react";
 import styles from "./Category.module.scss";
 import classNames from "classnames/bind";
 import { useNavigate } from "react-router-dom";
@@ -20,12 +21,14 @@ import {
     addModalStatus,
     addActionBtnTitle,
     addToastIsActive,
+    addToastNotification,
 } from "../../redux/Slice/globalSlice";
 import {
     selectReload,
     selectModalShow,
     selectCurrentUser,
     selectToastIsActive,
+    selectToastNotification,
 } from "../../redux/selector";
 import { axiosCreateJWT } from "../../util/jwtRequest";
 import { loginSuccess } from "../../redux/Slice/auth";
@@ -44,6 +47,7 @@ function Category() {
     const modalStatus = useSelector(selectModalShow);
     const currentUser = useSelector(selectCurrentUser);
     const toastIsActive = useSelector(selectToastIsActive);
+    const toastNotification = useSelector(selectToastNotification);
 
     const handleAddProduct = () => {
         dispatch(addActionBtnTitle("add"));
@@ -88,6 +92,7 @@ function Category() {
                 setNotification(result);
                 dispatch(addReload(!reload));
                 dispatch(addToastIsActive(!toastIsActive));
+                dispatch(addToastNotification(result));
             } catch (error) {
                 console.log(error);
             }
@@ -102,10 +107,7 @@ function Category() {
 
     return (
         <div>
-            <ToastNotification
-                action={notification.action}
-                message={notification.message}
-            />
+            <ToastNotification></ToastNotification>
             <Button
                 onClick={handleAddProduct}
                 leftIcon={<AddIcon fontSize="large" />}

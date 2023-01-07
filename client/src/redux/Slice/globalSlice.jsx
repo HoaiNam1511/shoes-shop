@@ -5,7 +5,10 @@ const initialState = {
     modalStatus: false,
     reload: false,
     isClearForm: false,
-    toastIsActive: false,
+    toast: {
+        toastIsActive: false,
+        toastNotification: [],
+    },
 };
 
 const globalSlice = createSlice({
@@ -25,7 +28,15 @@ const globalSlice = createSlice({
             state.isClearForm = action.payload;
         },
         addToastIsActive(state, action) {
-            state.toastIsActive = action.payload;
+            state.toast.toastIsActive = action.payload;
+        },
+        addToastNotification(state, action) {
+            console.log(action);
+            console.log("come");
+            state = {
+                ...state,
+                //toastNotification: [...state.toastNotification, action.payload],
+            };
         },
     },
 });
@@ -38,6 +49,7 @@ export const {
     addClearForm,
     addNotification,
     addToastIsActive,
+    addToastNotification,
 } = globalSlice.actions;
 
 export default globalSlice;

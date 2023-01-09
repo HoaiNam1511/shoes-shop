@@ -22,7 +22,7 @@ const checkAdminAuth = (req, res, next) => {
         next();
     } else {
         res.send({
-            message: "You cannot allowed other",
+            message: "This feature only available to Admin account",
             action: "warning",
         });
     }

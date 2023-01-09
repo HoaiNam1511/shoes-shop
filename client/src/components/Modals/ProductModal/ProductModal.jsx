@@ -20,7 +20,11 @@ import {
     selectActionBtnTitle,
     selectCurrentUser,
 } from "../../../redux/selector";
-import { addReload, addClearForm } from "../../../redux/Slice/globalSlice";
+import {
+    addReload,
+    addClearForm,
+    addToast,
+} from "../../../redux/Slice/globalSlice";
 import { axiosCreateJWT } from "../../../util/jwtRequest";
 import { loginSuccess } from "../../../redux/Slice/auth";
 
@@ -75,17 +79,17 @@ function ProductModal() {
     const handleAddProduct = async () => {
         formDataFunc();
         try {
-            const response = await productService.createProduct(
+            const result = await productService.createProduct(
                 productData,
                 {
                     headers: { token: currentUser?.token },
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
-            if (response === "success") {
-                dispatch(addReload(!reload));
-                dispatch(addClearForm(!isClearForm));
-            }
+
+            dispatch(addToast(result));
+            dispatch(addReload(!reload));
+            dispatch(addClearForm(!isClearForm));
         } catch (error) {
             console.log(error);
         }
@@ -94,7 +98,7 @@ function ProductModal() {
     const handleUpdateProduct = async () => {
         formDataFunc();
         try {
-            const response = await productService.updateProduct(
+            const result = await productService.updateProduct(
                 productId,
                 productData,
                 {
@@ -105,9 +109,9 @@ function ProductModal() {
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
-            if (response === "success") {
-                dispatch(addReload(!reload));
-            }
+
+            dispatch(addToast(result));
+            dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
         }

@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Fragment } from "react";
 import router from "./router";
 import Login from "./page/Login/Login";
+import ToastNotification from "./components/Toast/ToastNotification/ToastNotification";
+
 function App() {
     return (
         <Router>

@@ -17,6 +17,7 @@ import {
     addModalStatus,
     addActionBtnTitle,
     addReload,
+    addToast,
 } from "../../redux/Slice/globalSlice";
 import { addUser } from "../../redux/Slice/userSlice";
 import {
@@ -49,13 +50,14 @@ function User() {
 
     const handleDeleteUser = async (id) => {
         try {
-            await userService.deleteUser(
+            const result = await userService.deleteUser(
                 id,
                 {
                     headers: { token: currentUser?.token },
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
+            dispatch(addToast(result));
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);

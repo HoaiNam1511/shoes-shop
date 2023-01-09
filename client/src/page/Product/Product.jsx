@@ -24,6 +24,7 @@ import {
     addActionBtnTitle,
     addModalStatus,
     addReload,
+    addToast,
 } from "../../redux/Slice/globalSlice";
 import { axiosCreateJWT } from "../../util/jwtRequest";
 import { selectCurrentUser, selectReload } from "../../redux/selector";
@@ -76,13 +77,14 @@ function Product() {
     };
     const handleDeleteProduct = async (id) => {
         try {
-            await productService.deleteProduct(
+            const result = await productService.deleteProduct(
                 id,
                 {
                     headers: { token: currentUser?.token },
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
+            dispatch(addToast(result));
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);

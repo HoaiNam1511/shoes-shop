@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import { useRef, useState } from "react";
 import classNames from "classnames/bind";
 
 import styles from "./Modal.module.scss";

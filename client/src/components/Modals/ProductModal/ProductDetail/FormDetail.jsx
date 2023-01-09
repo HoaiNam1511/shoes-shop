@@ -18,7 +18,7 @@ function FormInfo({ className }) {
     const categorys = useSelector(selectCategory);
     const productInfo = useSelector(selectProduct);
     const isClearForm = useSelector(selectIsClearForm);
-    // console.log("form info");
+
     const [product, setProduct] = useState({
         productId: "",
         productName: "",

@@ -5,9 +5,10 @@ const initialState = {
     modalStatus: false,
     reload: false,
     isClearForm: false,
-    toast: {
-        toastIsActive: false,
-        toastNotification: [],
+    toast: {},
+    sort: {
+        column: "",
+        data: [],
     },
 };
 
@@ -18,25 +19,25 @@ const globalSlice = createSlice({
         addActionBtnTitle(state, action) {
             state.actionBtnTitle = action.payload;
         },
+
         addModalStatus(state, action) {
             state.modalStatus = action.payload;
         },
+
         addReload(state, action) {
             state.reload = action.payload;
         },
+
         addClearForm(state, action) {
             state.isClearForm = action.payload;
         },
-        addToastIsActive(state, action) {
-            state.toast.toastIsActive = action.payload;
+
+        addToast(state, action) {
+            state.toast = action.payload;
         },
-        addToastNotification(state, action) {
-            console.log(action);
-            console.log("come");
-            state = {
-                ...state,
-                //toastNotification: [...state.toastNotification, action.payload],
-            };
+
+        addSortData(state, action) {
+            state.sort = {};
         },
     },
 });
@@ -49,7 +50,7 @@ export const {
     addClearForm,
     addNotification,
     addToastIsActive,
-    addToastNotification,
+    addToast,
 } = globalSlice.actions;
 
 export default globalSlice;

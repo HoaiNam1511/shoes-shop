@@ -13,8 +13,9 @@ const getALLCategoryGroup = async (req, res) => {
 };
 
 const getAllCategory = async (req, res) => {
-    let page = req.query.page;
-
+    const page = req.query.page;
+    const sortBy = req.query.sortBy;
+    const orderBy = req.query.orderBy;
     if (page) {
         const offset = (page - 1) * ITEM_PER_PAGE;
         try {
@@ -23,12 +24,12 @@ const getAllCategory = async (req, res) => {
                 include: [
                     {
                         model: Category_group,
-                        //attributes: ["category_group_title"],
+                        as: "category_group",
                     },
                 ],
                 offset: offset,
                 limit: ITEM_PER_PAGE,
-                order: [["fk_category_group_id", "ASC"]],
+                order: [[sortBy || "id", orderBy || "DESC"]],
             });
             const totalPage = await Math.ceil(categorys.count / ITEM_PER_PAGE);
             res.send({
@@ -45,10 +46,11 @@ const getAllCategory = async (req, res) => {
                 include: [
                     {
                         model: Category_group,
-                        //attributes: ["category_group_title"],
+                        as: "category_group",
                     },
                 ],
-                order: [["fk_category_group_id", "ASC"]],
+                //order: [["fk_category_group_id", "ASC"]],
+                order: [[sortBy || "id", orderBy || "DESC"]],
             });
             const totalPage = await Math.ceil(categorys.count / ITEM_PER_PAGE);
             res.send({
@@ -68,6 +70,7 @@ const createCategory = async (req, res) => {
             fk_category_group_id: categoryGroupId,
             category_title: categoryTitle,
         });
+
         res.send({
             message: "Add category success",
             action: "add",

@@ -82,7 +82,10 @@ const createUser = async (req, res, next) => {
             UserId: user.id,
             RoleId: role,
         });
-        res.send("success");
+        res.send({
+            message: "Add user success",
+            action: "add",
+        });
     } catch (error) {
         console.log(error);
     }
@@ -116,7 +119,10 @@ const updateUser = async (req, res, next) => {
                 },
             }
         );
-        res.send("updated");
+        res.send({
+            message: "Update user success",
+            action: "update",
+        });
     } catch (error) {
         console.log(error);
     }
@@ -136,7 +142,10 @@ const deleteUser = async (req, res, next) => {
                 UserId: id,
             },
         });
-        res.send("delete");
+        res.send({
+            message: "Delete user success",
+            action: "delete",
+        });
     } catch (error) {
         console.log(error);
     }

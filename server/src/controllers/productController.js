@@ -75,7 +75,10 @@ const createProduct = async (req, res) => {
 
         try {
             await Product_image.bulkCreate(newArrayImg);
-            res.send("success");
+            res.send({
+                message: "Add product success",
+                action: "add",
+            });
         } catch (error) {
             console.log(error);
         }
@@ -201,7 +204,10 @@ const updateProduct = async (req, res) => {
 
         try {
             await Product_image.bulkCreate(newArrayImg);
-            res.send("success");
+            res.send({
+                message: "Update category success",
+                action: "update",
+            });
         } catch (error) {
             console.log(error);
         }
@@ -215,7 +221,10 @@ const deleteProduct = async (req, res) => {
                 id: id,
             },
         });
-        res.send("success");
+        res.send({
+            message: "Delete category success",
+            action: "delete",
+        });
     } catch (error) {
         console.log(error);
     }

@@ -18,6 +18,12 @@ const Category = db.define("Categorys", {
         allowNull: false,
     },
 });
-Category_group.hasMany(Category, { foreignKey: "fk_category_group_id" });
-Category.belongsTo(Category_group, { foreignKey: "fk_category_group_id" });
+Category_group.hasMany(Category, {
+    foreignKey: "fk_category_group_id",
+    as: "category_group",
+});
+Category.belongsTo(Category_group, {
+    foreignKey: "fk_category_group_id",
+    as: "category_group",
+});
 module.exports = Category;

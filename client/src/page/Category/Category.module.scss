@@ -2,3 +2,11 @@
     position: fixed;
     right: 0px;
 }
+
+.arrow {
+    -webkit-user-select: none;
+    user-select: none;
+    &:hover {
+        cursor: pointer;
+    }
+}

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import classNames from "classnames/bind";
-import Modal from "../Modal/Modal";
 
 import * as service from "../../../service/categoryService";
 
+import Modal from "../Modal/Modal";
 import Button from "../../Button/Button";
 import styles from "./CategoryModal.module.scss";
 
@@ -15,28 +15,27 @@ import {
     selectActionBtnTitle,
     selectCurrentUser,
 } from "../../../redux/selector";
-import { addReload } from "../../../redux/Slice/globalSlice";
+import { addReload, addToast } from "../../../redux/Slice/globalSlice";
 import { axiosCreateJWT } from "../../../util/jwtRequest";
 import { loginSuccess, logOutSuccess } from "../../../redux/Slice/auth";
-import ToastNotification from "../../Toast/ToastNotification/ToastNotification";
+
 const cx = classNames.bind(styles);
 
 function CategoryModal({ className }) {
     const dispatch = useDispatch();
     const reload = useSelector(selectReload);
     const categoryGroups = useSelector(selectCategoryGroup);
-    const categoryRedux = useSelector(selectCategory);
+    const categoryInfo = useSelector(selectCategory);
     const currentUser = useSelector(selectCurrentUser);
     let actionBtnTitle = useSelector(selectActionBtnTitle);
-    const [notification, setNotification] = useState("");
-
-    console.log(notification);
-    const { id, fk_category_group_id, category_title } = categoryRedux;
+    const { id, fk_category_group_id, category_title } = categoryInfo;
 
     const [category, setCategory] = useState({
         categoryGroupId: "",
         categoryTitle: "",
     });
+    const { categoryGroupId, categoryTitle } = category;
+
     useEffect(() => {
         if (categoryGroups.length > 0) {
             setCategory({
@@ -45,10 +44,11 @@ function CategoryModal({ className }) {
             });
         }
     }, [categoryGroups]);
-    const { categoryGroupId, categoryTitle } = category;
+
     const handleValueChange = (e) => {
         setCategory({ ...category, [e.target.name]: e.target.value });
     };
+
     const handleAddCategory = async () => {
         try {
             const result = await service.addCategory(
@@ -58,7 +58,8 @@ function CategoryModal({ className }) {
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
-            setNotification(result);
+            dispatch(addToast(result));
+
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
@@ -75,20 +76,22 @@ function CategoryModal({ className }) {
                 },
                 axiosCreateJWT(currentUser, dispatch, logOutSuccess)
             );
-            setNotification(result);
+            dispatch(addToast(result));
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
         }
     };
+
     useEffect(() => {
-        if (categoryRedux) {
+        if (categoryInfo) {
             setCategory({
                 categoryGroupId: fk_category_group_id,
                 categoryTitle: category_title,
             });
         }
-    }, [categoryRedux]);
+    }, [categoryInfo]);
+
     return (
         <div>
             <Modal className={cx("wrapper")} title="Category">

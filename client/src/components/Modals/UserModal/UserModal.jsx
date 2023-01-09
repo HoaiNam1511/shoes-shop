@@ -10,7 +10,7 @@ import Modal from "../Modal/Modal";
 import Button from "../../Button/Button";
 
 import { selectReload, selectActionBtnTitle } from "../../../redux/selector";
-import { addReload } from "../../../redux/Slice/globalSlice";
+import { addReload, addToast } from "../../../redux/Slice/globalSlice";
 import { selectUser } from "../../../redux/selector";
 import { accountStatus } from "../../../data/";
 import { selectCurrentUser } from "../../../redux/selector";
@@ -74,13 +74,14 @@ function UserModal({ className }) {
 
     const handleAddUser = async () => {
         try {
-            await userService.createUser(
+            const result = await userService.createUser(
                 user,
                 {
                     headers: { token: currentUser?.token },
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
+            dispatch(addToast(result));
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);
@@ -88,7 +89,7 @@ function UserModal({ className }) {
     };
     const handleUpdateUser = async () => {
         try {
-            await userService.updateUser(
+            const result = await userService.updateUser(
                 id,
                 user,
                 {
@@ -96,6 +97,7 @@ function UserModal({ className }) {
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
+            dispatch(addToast(result));
             dispatch(addReload(!reload));
         } catch (error) {
             console.log(error);

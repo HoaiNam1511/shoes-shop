@@ -1,9 +1,11 @@
 import * as request from "../util/httpRequest";
 
-export const getCategory = async (page) => {
+export const getCategory = async (page = 1, sortBy = "", orderBy = "") => {
     let result;
     if (page) {
-        result = await request.getRequest(`category?page=${page}`);
+        result = await request.getRequest(
+            `category?page=${page}&sortBy=${sortBy}&orderBy=${orderBy}`
+        );
     } else {
         result = await request.getRequest("category/get/");
     }

@@ -1,9 +1,11 @@
 import * as request from "../util/httpRequest";
 
-export const getProduct = async (page) => {
+export const getProduct = async (page, sortColumn, order) => {
     let result;
     if (page) {
-        result = await request.getRequest(`product?page=${page}`);
+        result = await request.getRequest(
+            `product?page=${page}&sortBy=${sortColumn}&orderBy=${order}`
+        );
     } else {
         result = await request.getRequest("product/get");
     }

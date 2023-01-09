@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import * as productService from "../../../service/productService";
 
 import Modal from "../Modal/Modal";
-import Button from "../../Button/Button";
+import Button from "../../Buttons/Button/Button";
 import styles from "./ProductModal.module.scss";
 import FormInfo from "./ProductDetail/FormDetail";
 import FormImage from "./ProductImage/FormImage";

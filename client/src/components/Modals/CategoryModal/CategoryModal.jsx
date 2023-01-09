@@ -5,7 +5,7 @@ import classNames from "classnames/bind";
 import * as service from "../../../service/categoryService";
 
 import Modal from "../Modal/Modal";
-import Button from "../../Button/Button";
+import Button from "../../Buttons/Button/Button";
 import styles from "./CategoryModal.module.scss";
 
 import {

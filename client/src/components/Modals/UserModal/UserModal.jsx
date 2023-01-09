@@ -7,7 +7,7 @@ import * as authService from "../../../service/authService";
 
 import styles from "./UserModal.module.scss";
 import Modal from "../Modal/Modal";
-import Button from "../../Button/Button";
+import Button from "../../Buttons/Button/Button";
 
 import { selectReload, selectActionBtnTitle } from "../../../redux/selector";
 import { addReload, addToast } from "../../../redux/Slice/globalSlice";

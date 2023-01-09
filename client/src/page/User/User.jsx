@@ -1,16 +1,17 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import classNames from "classnames/bind";
 
 import AddIcon from "@mui/icons-material/Add";
-import Button from "../../components/Button/Button";
-import ActionButton from "../../components/Button/ActionButton/ActionButton";
+import Button from "../../components/Buttons/Button/Button";
+import ActionButton from "../../components/Buttons/ActionButton/ActionButton";
 import Paginate from "../../components/Paginate/Paginate";
+import Arrow from "../../components/Buttons/Arrow/Arrow";
 
 import * as userService from "../../service/userService";
 import * as authService from "../../service/authService";
 import styles from "./User.module.scss";
-import classNames from "classnames/bind";
 
 import UserModal from "../../components/Modals/UserModal/UserModal";
 import {
@@ -31,6 +32,10 @@ import { axiosCreateJWT } from "../../util/jwtRequest";
 const cx = classNames.bind(styles);
 function User() {
     const dispatch = useDispatch();
+    const orderASC = "ASC";
+    const orderDESC = "DESC";
+    const [orderBy, setOrderBy] = useState(orderASC);
+    const [sortBy, setSortBy] = useState("id");
     const [pageCount, setPageCount] = useState(0);
     const [page, setPage] = useState(1);
     const [users, setUsers] = useState([]);
@@ -64,25 +69,39 @@ function User() {
         }
     };
 
+    const getUser = async (column = sortBy || "", order = orderBy || "") => {
+        try {
+            const response = await userService.getUser(
+                page,
+                {
+                    headers: { token: currentUser?.token },
+                },
+                axiosCreateJWT(currentUser, dispatch, loginSuccess),
+                column,
+                order
+            );
+            setUsers(response.data);
+            setPageCount(response.totalPage);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
-        const result = async () => {
-            try {
-                const response = await userService.getUser(
-                    page,
-                    {
-                        headers: { token: currentUser?.token },
-                    },
-                    axiosCreateJWT(currentUser, dispatch, loginSuccess)
-                );
-                setUsers(response.data);
-                setPageCount(response.totalPage);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        result();
+        getUser();
     }, [page, reload]);
 
+    const handleSortUser = (column, order) => {
+        if (order === orderASC) {
+            getUser(column, order);
+            setSortBy(column);
+            setOrderBy(orderASC);
+        } else if (order === orderDESC) {
+            getUser(column, order);
+            setSortBy(column);
+            setOrderBy(orderDESC);
+        }
+    };
     return (
         <div>
             <Button
@@ -96,9 +115,47 @@ function User() {
                 <caption>Users</caption>
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
+                        <th>
+                            #{" "}
+                            <Arrow
+                                arrowUp
+                                onClick={() => handleSortUser("id", orderASC)}
+                            ></Arrow>
+                            <Arrow
+                                arrowDown
+                                onClick={() => handleSortUser("id", orderDESC)}
+                            ></Arrow>
+                        </th>
+                        <th>
+                            Name{" "}
+                            <Arrow
+                                arrowUp
+                                onClick={() =>
+                                    handleSortUser("user_name", orderASC)
+                                }
+                            ></Arrow>
+                            <Arrow
+                                arrowDown
+                                onClick={() =>
+                                    handleSortUser("user_name", orderDESC)
+                                }
+                            ></Arrow>
+                        </th>
+                        <th>
+                            Email{" "}
+                            <Arrow
+                                arrowUp
+                                onClick={() =>
+                                    handleSortUser("email", orderASC)
+                                }
+                            ></Arrow>
+                            <Arrow
+                                arrowDown
+                                onClick={() =>
+                                    handleSortUser("email", orderDESC)
+                                }
+                            ></Arrow>
+                        </th>
                         <th>Role</th>
                         <th>Status</th>
                         <th>Action</th>

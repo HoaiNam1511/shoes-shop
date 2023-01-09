@@ -1,7 +1,10 @@
 import * as request from "../util/httpRequest";
 
-export const getUser = async (page, headers, axiosJWT) => {
-    const result = await axiosJWT.get(`user/get?page=${page}`, headers);
+export const getUser = async (page, headers, axiosJWT, sortBy, orderBy) => {
+    const result = await axiosJWT.get(
+        `user/get?page=${page}&sortBy=${sortBy}&orderBy=${orderBy}`,
+        headers
+    );
     return result.data;
 };
 

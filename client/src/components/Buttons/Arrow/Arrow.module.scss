@@ -1,0 +1,9 @@
+.arrow {
+    -webkit-user-select: none;
+    user-select: none;
+    padding: 0 5px;
+    display: inline-block;
+    &:hover {
+        cursor: pointer;
+    }
+}

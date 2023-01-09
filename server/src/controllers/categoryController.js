@@ -13,9 +13,8 @@ const getALLCategoryGroup = async (req, res) => {
 };
 
 const getAllCategory = async (req, res) => {
-    const page = req.query.page;
-    const sortBy = req.query.sortBy;
-    const orderBy = req.query.orderBy;
+    const { page, sortBy, orderBy } = req.query;
+
     if (page) {
         const offset = (page - 1) * ITEM_PER_PAGE;
         try {

@@ -62,12 +62,13 @@ function FormInfo({ className }) {
 
     // Get default initial category
     useEffect(() => {
-        let initialCategoryId = categorys.filter((category, index, arr) => {
+        let initialCategoryId = categorys?.filter((category, index, arr) => {
             return (
                 index ===
                 arr.findIndex(
                     (i) =>
-                        i.fk_category_group_id === category.fk_category_group_id
+                        i?.fk_category_group_id ===
+                        category?.fk_category_group_id
                 )
             );
         });
@@ -75,11 +76,11 @@ function FormInfo({ className }) {
         if (initialCategoryId.length > 0) {
             setProduct({
                 ...product,
-                categoryStatusId: initialCategoryId[0].id,
-                categoryStyleId: initialCategoryId[1].id,
-                categoryLineId: initialCategoryId[2].id,
-                categoryCollectionId: initialCategoryId[3].id,
-                categoryMaterialId: initialCategoryId[4].id,
+                categoryStatusId: initialCategoryId[0]?.id,
+                categoryStyleId: initialCategoryId[1]?.id,
+                categoryLineId: initialCategoryId[2]?.id,
+                categoryCollectionId: initialCategoryId[3]?.id,
+                categoryMaterialId: initialCategoryId[4]?.id,
             });
         }
     }, [categorys]);
@@ -88,15 +89,15 @@ function FormInfo({ className }) {
     useEffect(() => {
         if (productInfo.id) {
             setProduct({
-                productId: productInfo.id,
-                productName: productInfo.product_name,
-                productPrice: productInfo.product_price,
-                productSex: productInfo.product_sex,
-                categoryStatusId: productInfo.fk_category_status_id,
-                categoryStyleId: productInfo.fk_category_style_id,
-                categoryLineId: productInfo.fk_category_line_id,
-                categoryCollectionId: productInfo.fk_category_collection_id,
-                categoryMaterialId: productInfo.fk_category_material_id,
+                productId: productInfo?.id,
+                productName: productInfo?.product_name,
+                productPrice: productInfo?.product_price,
+                productSex: productInfo?.product_sex,
+                categoryStatusId: productInfo?.fk_category_status_id,
+                categoryStyleId: productInfo?.fk_category_style_id,
+                categoryLineId: productInfo?.fk_category_line_id,
+                categoryCollectionId: productInfo?.fk_category_collection_id,
+                categoryMaterialId: productInfo?.fk_category_material_id,
             });
         }
     }, [productInfo]);

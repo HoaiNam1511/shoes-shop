@@ -8,9 +8,10 @@ import AddIcon from "@mui/icons-material/Add";
 import * as categoryService from "../../service/categoryService";
 
 import CategoryModal from "../../components/Modals/CategoryModal/CategoryModal";
-import Button from "../../components/Button/Button";
-import ActionButton from "../../components/Button/ActionButton/ActionButton";
+import Button from "../../components/Buttons/Button/Button";
+import ActionButton from "../../components/Buttons/ActionButton/ActionButton";
 import Paginate from "../../components/Paginate/Paginate";
+import Arrow from "../../components/Buttons/Arrow/Arrow";
 
 import { addCategoryGroup, addCategory } from "../../redux/Slice/categorySlice";
 import {
@@ -30,9 +31,12 @@ import { loginSuccess } from "../../redux/Slice/auth";
 const cx = classNames.bind(styles);
 function Category() {
     const dispatch = useDispatch();
+    const orderASC = "ASC";
+    const orderDESC = "DESC";
+    const [orderBy, setOrderBy] = useState(orderASC);
+    const [sortBy, setSortBy] = useState("id");
     const [categorys, setCategorys] = useState([]);
     const [pageCount, setPageCount] = useState(0);
-    const [order, setOrder] = useState("DESC");
     const [page, setPage] = useState(1);
     const reload = useSelector(selectReload);
     const modalStatus = useSelector(selectModalShow);
@@ -58,12 +62,12 @@ function Category() {
         categoryGroup();
     }, [dispatch]);
 
-    const category = async (sortBy = "", orderBy = "") => {
+    const category = async (sort = sortBy || "", order = orderBy || "") => {
         try {
             const response = await categoryService.getCategory(
                 page,
-                sortBy,
-                orderBy
+                sort,
+                order
             );
             setCategorys(response.data);
             setPageCount(response.totalPage);
@@ -98,32 +102,19 @@ function Category() {
         dispatch(addModalStatus(!modalStatus));
     };
 
-    const handleSortCategory = (event, column) => {
-        // let newCategorySort = [...categorys];
-        let newCategorySort;
-        if (order === "ASC") {
+    const handleSortCategory = (order, column) => {
+        if (order === orderASC) {
             // console.log(e.currentTarget.textContent);
-            event.target.innerHTML = "&#9650;";
-            // newCategorySort = categorys.sort((categoryFirst, categorySecond) =>
-            //     categoryFirst[column] > categorySecond[column]
-            //         ? 1
-            //         : categoryFirst[column] > categorySecond[column]
-            //         ? 0
-            //         : -1
-            // );
-            setOrder("DESC");
-        } else if (order === "DESC") {
-            event.target.innerHTML = "&#9660;";
-            // newCategorySort = categorys.sort((categoryFirst, categorySecond) =>
-            //     categoryFirst[column] < categorySecond[column]
-            //         ? 1
-            //         : categoryFirst[column] < categorySecond[column]
-            //         ? 0
-            //         : -1
-            // );
-            setOrder("ASC");
+            // event.target.innerHTML = "&#9650;";
+            category(column, order);
+            setSortBy(column);
+            setOrderBy(orderASC);
+        } else if (order === orderDESC) {
+            // event.target.innerHTML = "&#9660;";
+            category(column, order);
+            setSortBy(column);
+            setOrderBy(orderDESC);
         }
-        // setCategorys(newCategorySort);
     };
 
     return (
@@ -137,41 +128,65 @@ function Category() {
             <CategoryModal></CategoryModal>
             <table>
                 <caption>Products</caption>
+
                 <thead>
                     <tr>
                         <th>
-                            #{" "}
-                            <span
-                                className={cx("arrow")}
-                                onClick={(e) => handleSortCategory(e, "id")}
-                            >
-                                &#9650;
-                            </span>
+                            #
+                            <Arrow
+                                arrowUp
+                                onClick={() =>
+                                    handleSortCategory(orderASC, "id")
+                                }
+                            ></Arrow>
+                            <Arrow
+                                arrowDown
+                                onClick={() =>
+                                    handleSortCategory(orderDESC, "id")
+                                }
+                            ></Arrow>
                         </th>
                         <th>
                             Title{" "}
-                            <span
-                                className={cx("arrow")}
-                                onClick={(e) =>
-                                    handleSortCategory(e, "category_title")
+                            <Arrow
+                                arrowUp
+                                onClick={() =>
+                                    handleSortCategory(
+                                        orderASC,
+                                        "category_title"
+                                    )
                                 }
-                            >
-                                &#9650;
-                            </span>
+                            ></Arrow>
+                            <Arrow
+                                arrowDown
+                                onClick={() =>
+                                    handleSortCategory(
+                                        orderDESC,
+                                        "category_title"
+                                    )
+                                }
+                            ></Arrow>
                         </th>
                         <th>
                             Category group{" "}
-                            <span
-                                className={cx("arrow")}
-                                onClick={(e) =>
+                            <Arrow
+                                arrowUp
+                                onClick={() =>
                                     handleSortCategory(
-                                        e,
-                                        "category_group.category_group_title"
+                                        orderASC,
+                                        "fk_category_group_id"
                                     )
                                 }
-                            >
-                                &#9650;
-                            </span>
+                            ></Arrow>
+                            <Arrow
+                                arrowDown
+                                onClick={() =>
+                                    handleSortCategory(
+                                        orderDESC,
+                                        "fk_category_group_id"
+                                    )
+                                }
+                            ></Arrow>
                         </th>
                         <th>Action</th>
                     </tr>

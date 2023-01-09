@@ -10,7 +10,7 @@ import logo from "../../asset/background/logo.png";
 import HttpsIcon from "@mui/icons-material/Https";
 
 import backgroundImage from "../../asset/background/login-background.jpg";
-import Button from "../../components/Button/Button";
+import Button from "../../components/Buttons/Button/Button";
 import ToastLogin from "../../components/Toast/ToastLogin/ToastLogin";
 import { loginStart, loginSuccess, loginFail } from "../../redux/Slice/auth";
 

@@ -86,7 +86,7 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProduct = async (req, res) => {
-    let page = req.query.page;
+    const { page, sortBy, orderBy } = req.query;
     if (page) {
         let offSet = (page - 1) * ITEM_PER_PAGE;
         try {
@@ -106,7 +106,7 @@ const getAllProduct = async (req, res) => {
                 offset: offSet,
                 limit: ITEM_PER_PAGE,
                 include: [{ model: Product_image, as: "product_images" }],
-                order: [["id", "DESC"]],
+                order: [[sortBy || "id", orderBy || "DESC"]],
             });
             const totalPage = await Math.ceil(products.count / ITEM_PER_PAGE);
             res.send({
@@ -132,7 +132,7 @@ const getAllProduct = async (req, res) => {
                     "fk_category_material_id",
                 ],
                 include: [{ model: Product_image, as: "product_images" }],
-                order: [["id", "DESC"]],
+                order: [[sortBy || "id", orderBy || "DESC"]],
             });
             res.send({
                 totalPage: products.count,

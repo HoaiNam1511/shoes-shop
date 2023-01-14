@@ -12,6 +12,7 @@ const persistConfig = {
     storage,
     whitelist: ["authReducer"],
 };
+
 const reducer = combineReducers({
     productReducer: productSlice.reducer,
     categoryReducer: categorySlice.reducer,

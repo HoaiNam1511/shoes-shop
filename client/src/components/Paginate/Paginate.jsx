@@ -3,6 +3,7 @@ import classNames from "classnames/bind";
 import styles from "./Paginate.module.scss";
 const cx = classNames.bind(styles);
 function Paginate({ pageCount, onClick }) {
+    //Handle change page
     const handlePageClick = (event) => {
         onClick(event.selected + 1);
     };

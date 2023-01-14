@@ -14,14 +14,12 @@ import FormImage from "./ProductImage/FormImage";
 import {
     selectProduct,
     selectProductImage,
-    selectReload,
     selectProductImageFile,
-    selectIsClearForm,
     selectActionBtnTitle,
     selectCurrentUser,
 } from "../../../redux/selector";
 import {
-    addReload,
+    reloadData,
     addClearForm,
     addToast,
 } from "../../../redux/Slice/globalSlice";
@@ -31,16 +29,15 @@ import { loginSuccess } from "../../../redux/Slice/auth";
 const cx = classNames.bind(styles);
 
 function ProductModal() {
-    const [tab, setTab] = useState("info");
     const dispatch = useDispatch();
+    const [tab, setTab] = useState("info");
 
     const productImageFiles = useSelector(selectProductImageFile);
     const productImages = useSelector(selectProductImage);
     const productStatus = useSelector(selectActionBtnTitle);
-    const isClearForm = useSelector(selectIsClearForm);
-    const reload = useSelector(selectReload);
     const currentUser = useSelector(selectCurrentUser);
     let productData = new FormData();
+
     const {
         productId,
         productName,
@@ -58,7 +55,7 @@ function ProductModal() {
     const handleChangeTab = (e) => {
         setTab(e);
     };
-
+    //Add product to formData (when have image)
     const formDataFunc = () => {
         Array.from(productImageFiles).forEach((image) => {
             productData.append("productImages", image);
@@ -86,10 +83,9 @@ function ProductModal() {
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
-
             dispatch(addToast(result));
-            dispatch(addReload(!reload));
-            dispatch(addClearForm(!isClearForm));
+            dispatch(reloadData());
+            dispatch(addClearForm());
         } catch (error) {
             console.log(error);
         }
@@ -111,7 +107,7 @@ function ProductModal() {
             );
 
             dispatch(addToast(result));
-            dispatch(addReload(!reload));
+            dispatch(reloadData());
         } catch (error) {
             console.log(error);
         }

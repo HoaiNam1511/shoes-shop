@@ -1,18 +1,18 @@
 import PropTypes from "prop-types";
 import classNames from "classnames/bind";
-
 import styles from "./Modal.module.scss";
 
 import { useDispatch, useSelector } from "react-redux";
-import { addModalStatus } from "../../../redux/Slice/globalSlice";
+import { closeModal } from "../../../redux/Slice/globalSlice";
 import { selectModalShow } from "../../../redux/selector";
 
 const cx = classNames.bind(styles);
 function Modal({ children, className, title = "THIS IS TITLE" }) {
     const dispatch = useDispatch();
     let modalShow = useSelector(selectModalShow);
+    console.log("MODAL");
     const handleCloseModal = () => {
-        dispatch(addModalStatus(false));
+        dispatch(closeModal());
     };
     return (
         <>

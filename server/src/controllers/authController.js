@@ -14,7 +14,7 @@ const generateAccessToken = (user) => {
             role: user.role,
         },
         secretKey,
-        { expiresIn: "30s" }
+        { expiresIn: "60s" }
     );
 };
 const generateRefreshToken = (user) => {

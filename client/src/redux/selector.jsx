@@ -5,12 +5,10 @@ export const selectProductImageFile = (state) =>
 export const selectProductImage = (state) => state.productReducer.productImages;
 //Export selection category
 export const selectCategory = (state) => state.categoryReducer.category;
-export const selectCategoryGroup = (state) =>
-    state.categoryReducer.categoryGroups;
 //Global
 export const selectActionBtnTitle = (state) =>
     state.globalReducer.actionBtnTitle;
-export const selectModalShow = (state) => state.globalReducer.modalStatus;
+export const selectModalShow = (state) => state.globalReducer.isOpenModal;
 export const selectReload = (state) => state.globalReducer.reload;
 export const selectIsClearForm = (state) => state.globalReducer.isClearForm;
 export const selectToast = (state) => state.globalReducer.toast;

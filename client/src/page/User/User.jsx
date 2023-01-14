@@ -10,22 +10,19 @@ import Paginate from "../../components/Paginate/Paginate";
 import Arrow from "../../components/Buttons/Arrow/Arrow";
 
 import * as userService from "../../service/userService";
-import * as authService from "../../service/authService";
+
 import styles from "./User.module.scss";
 
 import UserModal from "../../components/Modals/UserModal/UserModal";
 import {
-    addModalStatus,
-    addActionBtnTitle,
-    addReload,
+    openModal,
+    updateBtnTitle,
+    addBtnTitle,
+    reloadData,
     addToast,
 } from "../../redux/Slice/globalSlice";
 import { addUser } from "../../redux/Slice/userSlice";
-import {
-    selectModalShow,
-    selectReload,
-    selectCurrentUser,
-} from "../../redux/selector";
+import { selectReload, selectCurrentUser } from "../../redux/selector";
 import { loginSuccess } from "../../redux/Slice/auth";
 import { axiosCreateJWT } from "../../util/jwtRequest";
 
@@ -34,36 +31,39 @@ function User() {
     const dispatch = useDispatch();
     const orderASC = "ASC";
     const orderDESC = "DESC";
-    const [orderBy, setOrderBy] = useState(orderASC);
-    const [sortBy, setSortBy] = useState("id");
+    const [sort, setSort] = useState({
+        sortBy: "id",
+        orderBy: orderASC,
+    });
     const [pageCount, setPageCount] = useState(0);
     const [page, setPage] = useState(1);
     const [users, setUsers] = useState([]);
-    const modalStatus = useSelector(selectModalShow);
     const reload = useSelector(selectReload);
     const currentUser = useSelector(selectCurrentUser);
+    const { sortBy, orderBy } = sort;
 
     const handleAddUser = () => {
-        dispatch(addActionBtnTitle("add"));
-        dispatch(addModalStatus(!modalStatus));
-    };
-    const handleUpdateUser = (a) => {
-        dispatch(addUser(a));
-        dispatch(addActionBtnTitle("update"));
-        dispatch(addModalStatus(!modalStatus));
+        dispatch(addBtnTitle());
+        dispatch(openModal());
     };
 
-    const handleDeleteUser = async (id) => {
+    const handleUpdateUser = (a) => {
+        dispatch(addUser(a));
+        dispatch(updateBtnTitle());
+        dispatch(openModal());
+    };
+
+    const handleDeleteUser = async (id, name) => {
         try {
             const result = await userService.deleteUser(
                 id,
                 {
-                    headers: { token: currentUser?.token },
+                    headers: { token: currentUser?.token, name: name },
                 },
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
             dispatch(addToast(result));
-            dispatch(addReload(!reload));
+            dispatch(reloadData());
         } catch (error) {
             console.log(error);
         }
@@ -94,14 +94,13 @@ function User() {
     const handleSortUser = (column, order) => {
         if (order === orderASC) {
             getUser(column, order);
-            setSortBy(column);
-            setOrderBy(orderASC);
+            setSort({ sortBy: column, order: order });
         } else if (order === orderDESC) {
             getUser(column, order);
-            setSortBy(column);
-            setOrderBy(orderDESC);
+            setSort({ sortBy: column, order: order });
         }
     };
+
     return (
         <div>
             <Button
@@ -174,7 +173,12 @@ function User() {
                             <td>
                                 <ActionButton
                                     type="delete"
-                                    onClick={() => handleDeleteUser(user.id)}
+                                    onClick={() =>
+                                        handleDeleteUser(
+                                            user.id,
+                                            user.user_name
+                                        )
+                                    }
                                 ></ActionButton>
                                 <ActionButton
                                     type="update"

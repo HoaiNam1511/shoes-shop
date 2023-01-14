@@ -1,9 +1,10 @@
 import { useState } from "react";
-import styles from "./Login.module.scss";
 import classNames from "classnames/bind";
 import { useNavigate } from "react-router-dom";
-import * as authService from "../../service/authService";
 import { useDispatch } from "react-redux";
+import styles from "./Login.module.scss";
+
+import * as authService from "../../service/authService";
 
 import PersonIcon from "@mui/icons-material/Person";
 import logo from "../../asset/background/logo.png";
@@ -12,6 +13,7 @@ import HttpsIcon from "@mui/icons-material/Https";
 import backgroundImage from "../../asset/background/login-background.jpg";
 import Button from "../../components/Buttons/Button/Button";
 import ToastLogin from "../../components/Toast/ToastLogin/ToastLogin";
+
 import { loginStart, loginSuccess, loginFail } from "../../redux/Slice/auth";
 
 const cx = classNames.bind(styles);
@@ -25,9 +27,11 @@ function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { userName, password } = user;
+
     const handleInputOnChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
+
     const handleLogin = async () => {
         dispatch(loginStart());
         try {
@@ -49,6 +53,7 @@ function Login() {
             e.preventDefault();
         }
     };
+
     const handleCloseToast = () => {
         setAction(null);
     };

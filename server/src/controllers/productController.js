@@ -143,6 +143,7 @@ const getAllProduct = async (req, res) => {
         }
     }
 };
+
 const updateProduct = async (req, res) => {
     upload(req, res, async function () {
         const { id } = req.params;

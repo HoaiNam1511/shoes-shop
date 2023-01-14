@@ -13,6 +13,7 @@ const getALLCategoryGroup = async (req, res) => {
 };
 
 const getAllCategory = async (req, res) => {
+    console.log("come");
     const { page, sortBy, orderBy } = req.query;
 
     if (page) {

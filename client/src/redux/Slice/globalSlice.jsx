@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     actionBtnTitle: "",
-    modalStatus: false,
+    isOpenModal: false,
     reload: false,
     isClearForm: false,
     toast: {},
@@ -16,41 +16,47 @@ const globalSlice = createSlice({
     name: "global",
     initialState,
     reducers: {
-        addActionBtnTitle(state, action) {
-            state.actionBtnTitle = action.payload;
+        openModal(state, action) {
+            state.isOpenModal = true;
         },
 
-        addModalStatus(state, action) {
-            state.modalStatus = action.payload;
+        closeModal(state, action) {
+            state.isOpenModal = false;
         },
 
-        addReload(state, action) {
-            state.reload = action.payload;
+        reloadData(state, action) {
+            state.reload = !state.reload;
         },
 
         addClearForm(state, action) {
-            state.isClearForm = action.payload;
+            state.isClearForm = !state.isClearForm;
         },
 
         addToast(state, action) {
             state.toast = action.payload;
         },
 
-        addSortData(state, action) {
-            state.sort = {};
+        addBtnTitle(state, action) {
+            state.actionBtnTitle = "add";
+        },
+
+        updateBtnTitle(state, action) {
+            state.actionBtnTitle = "update";
         },
     },
 });
 
 //Export action
 export const {
-    addActionBtnTitle,
-    addModalStatus,
-    addReload,
+    openModal,
+    closeModal,
+    reloadData,
     addClearForm,
     addNotification,
     addToastIsActive,
     addToast,
+    addBtnTitle,
+    updateBtnTitle,
 } = globalSlice.actions;
 
 export default globalSlice;

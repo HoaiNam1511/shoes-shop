@@ -1,11 +1,12 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "./Category.module.scss";
 import classNames from "classnames/bind";
-import { useDispatch, useSelector } from "react-redux";
 import AddIcon from "@mui/icons-material/Add";
 
 import * as categoryService from "../../service/categoryService";
+import { axiosCreateJWT } from "../../util/jwtRequest";
 
 import CategoryModal from "../../components/Modals/CategoryModal/CategoryModal";
 import Button from "../../components/Buttons/Button/Button";
@@ -13,19 +14,15 @@ import ActionButton from "../../components/Buttons/ActionButton/ActionButton";
 import Paginate from "../../components/Paginate/Paginate";
 import Arrow from "../../components/Buttons/Arrow/Arrow";
 
-import { addCategoryGroup, addCategory } from "../../redux/Slice/categorySlice";
+import { addCategory } from "../../redux/Slice/categorySlice";
 import {
-    addReload,
-    addModalStatus,
-    addActionBtnTitle,
+    reloadData,
+    openModal,
+    updateBtnTitle,
+    addBtnTitle,
     addToast,
 } from "../../redux/Slice/globalSlice";
-import {
-    selectReload,
-    selectModalShow,
-    selectCurrentUser,
-} from "../../redux/selector";
-import { axiosCreateJWT } from "../../util/jwtRequest";
+import { selectReload, selectCurrentUser } from "../../redux/selector";
 import { loginSuccess } from "../../redux/Slice/auth";
 
 const cx = classNames.bind(styles);
@@ -33,40 +30,29 @@ function Category() {
     const dispatch = useDispatch();
     const orderASC = "ASC";
     const orderDESC = "DESC";
-    const [orderBy, setOrderBy] = useState(orderASC);
-    const [sortBy, setSortBy] = useState("id");
+    const [sort, setSort] = useState({
+        sortBy: "id",
+        orderBy: orderASC,
+    });
     const [categorys, setCategorys] = useState([]);
     const [pageCount, setPageCount] = useState(0);
     const [page, setPage] = useState(1);
     const reload = useSelector(selectReload);
-    const modalStatus = useSelector(selectModalShow);
     const currentUser = useSelector(selectCurrentUser);
+    const { sortBy, orderBy } = sort;
 
     const handleAddProduct = () => {
         //Add title button
-        dispatch(addActionBtnTitle("add"));
+        dispatch(addBtnTitle());
         //Open modal
-        dispatch(addModalStatus(!modalStatus));
+        dispatch(openModal());
     };
 
-    const categoryGroup = async () => {
-        try {
-            const response = await categoryService.getCategoryGroup();
-            dispatch(addCategoryGroup(response));
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    useEffect(() => {
-        categoryGroup();
-    }, [dispatch]);
-
-    const category = async (sort = sortBy || "", order = orderBy || "") => {
+    const category = async (column = sortBy || "", order = orderBy || "") => {
         try {
             const response = await categoryService.getCategory(
                 page,
-                sort,
+                column,
                 order
             );
             setCategorys(response.data);
@@ -90,30 +76,25 @@ function Category() {
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
             dispatch(addToast(result));
-            dispatch(addReload(!reload));
+            dispatch(reloadData());
         } catch (error) {
             console.log(error);
         }
     };
 
     const handleUpdateCategory = (category) => {
-        dispatch(addActionBtnTitle("update"));
+        dispatch(updateBtnTitle());
         dispatch(addCategory(category));
-        dispatch(addModalStatus(!modalStatus));
+        dispatch(openModal());
     };
-
-    const handleSortCategory = (order, column) => {
+    // Handle sort table
+    const handleSortCategory = (column, order) => {
         if (order === orderASC) {
-            // console.log(e.currentTarget.textContent);
-            // event.target.innerHTML = "&#9650;";
             category(column, order);
-            setSortBy(column);
-            setOrderBy(orderASC);
+            setSort({ sortBy: column, order: order });
         } else if (order === orderDESC) {
-            // event.target.innerHTML = "&#9660;";
             category(column, order);
-            setSortBy(column);
-            setOrderBy(orderDESC);
+            setSort({ sortBy: column, order: order });
         }
     };
 
@@ -128,7 +109,6 @@ function Category() {
             <CategoryModal></CategoryModal>
             <table>
                 <caption>Products</caption>
-
                 <thead>
                     <tr>
                         <th>
@@ -136,13 +116,13 @@ function Category() {
                             <Arrow
                                 arrowUp
                                 onClick={() =>
-                                    handleSortCategory(orderASC, "id")
+                                    handleSortCategory("id", orderASC)
                                 }
                             ></Arrow>
                             <Arrow
                                 arrowDown
                                 onClick={() =>
-                                    handleSortCategory(orderDESC, "id")
+                                    handleSortCategory("id", orderDESC)
                                 }
                             ></Arrow>
                         </th>
@@ -152,8 +132,8 @@ function Category() {
                                 arrowUp
                                 onClick={() =>
                                     handleSortCategory(
-                                        orderASC,
-                                        "category_title"
+                                        "category_title",
+                                        orderASC
                                     )
                                 }
                             ></Arrow>
@@ -161,8 +141,8 @@ function Category() {
                                 arrowDown
                                 onClick={() =>
                                     handleSortCategory(
-                                        orderDESC,
-                                        "category_title"
+                                        "category_title",
+                                        orderDESC
                                     )
                                 }
                             ></Arrow>
@@ -173,8 +153,8 @@ function Category() {
                                 arrowUp
                                 onClick={() =>
                                     handleSortCategory(
-                                        orderASC,
-                                        "fk_category_group_id"
+                                        "fk_category_group_id",
+                                        orderASC
                                     )
                                 }
                             ></Arrow>
@@ -182,8 +162,8 @@ function Category() {
                                 arrowDown
                                 onClick={() =>
                                     handleSortCategory(
-                                        orderDESC,
-                                        "fk_category_group_id"
+                                        "fk_category_group_id",
+                                        orderDESC
                                     )
                                 }
                             ></Arrow>

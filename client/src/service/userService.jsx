@@ -13,8 +13,8 @@ export const createUser = async (user, headers, axiosJWT) => {
     return result.data;
 };
 
-export const updateUser = async (id, user, axiosJWT) => {
-    const result = await axiosJWT.put(`user/update/${id}`, user);
+export const updateUser = async (id, user, headers, axiosJWT) => {
+    const result = await axiosJWT.put(`user/update/${id}`, user, headers);
     return result.data;
 };
 

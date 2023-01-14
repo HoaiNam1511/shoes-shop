@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import * as productService from "../../service/productService";
 import * as categoryService from "../../service/categoryService";
+import { axiosCreateJWT } from "../../util/jwtRequest";
 
 import config from "../../config";
 import Button from "../../components/Buttons/Button/Button";
@@ -22,12 +23,12 @@ import {
     addProductImage,
 } from "../../redux/Slice/productSlice";
 import {
-    addActionBtnTitle,
-    addModalStatus,
-    addReload,
+    updateBtnTitle,
+    reloadData,
+    openModal,
     addToast,
+    addBtnTitle,
 } from "../../redux/Slice/globalSlice";
-import { axiosCreateJWT } from "../../util/jwtRequest";
 import { selectCurrentUser, selectReload } from "../../redux/selector";
 import { loginSuccess } from "../../redux/Slice/auth";
 
@@ -36,25 +37,30 @@ function Product() {
     const dispatch = useDispatch();
     const orderASC = "ASC";
     const orderDESC = "DESC";
-    const [orderBy, setOrderBy] = useState(orderASC);
-    const [sortBy, setSortBy] = useState("id");
+    const [sort, setSort] = useState({
+        sortBy: "id",
+        orderBy: orderASC,
+    });
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [pageCount, setPageCount] = useState(0);
     const reload = useSelector(selectReload);
     const currentUser = useSelector(selectCurrentUser);
-    //Get category
+    const { sortBy, orderBy } = sort;
+    //Get category for modal
+    const getCategory = async () => {
+        try {
+            const response = await categoryService.getCategory();
+            dispatch(addCategory(response.data));
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
-        const result = async () => {
-            try {
-                const response = await categoryService.getCategory();
-                dispatch(addCategory(response.data));
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        result();
+        getCategory();
     }, [dispatch]);
+
     //Get product
     const getProduct = async (column = sortBy || "", order = orderBy || "") => {
         try {
@@ -75,16 +81,18 @@ function Product() {
     }, [dispatch, reload, page]);
 
     const handleAddProduct = () => {
-        dispatch(addActionBtnTitle("add"));
-        dispatch(addModalStatus(true));
+        dispatch(addBtnTitle());
+        dispatch(openModal());
     };
+
     const handleUpdateProduct = (product) => {
         let productImage = product.product_images;
-        dispatch(addActionBtnTitle("update"));
+        dispatch(updateBtnTitle());
         dispatch(addProductImage(productImage));
         dispatch(addProductInfo(product));
-        dispatch(addModalStatus(true));
+        dispatch(openModal());
     };
+
     const handleDeleteProduct = async (id) => {
         try {
             const result = await productService.deleteProduct(
@@ -95,7 +103,7 @@ function Product() {
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
             dispatch(addToast(result));
-            dispatch(addReload(!reload));
+            dispatch(reloadData());
         } catch (error) {
             console.log(error);
         }
@@ -104,14 +112,13 @@ function Product() {
     const handleSortProduct = (column, order) => {
         if (order === orderASC) {
             getProduct(column, order);
-            setSortBy(column);
-            setOrderBy(orderASC);
+            setSort({ sortBy: column, order: order });
         } else if (order === orderDESC) {
             getProduct(column, order);
-            setSortBy(column);
-            setOrderBy(orderDESC);
+            setSort({ sortBy: column, order: order });
         }
     };
+
     return (
         <div>
             <Button

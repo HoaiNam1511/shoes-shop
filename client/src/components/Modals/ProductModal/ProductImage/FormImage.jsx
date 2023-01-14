@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import classNames from "classnames/bind";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
 
@@ -25,7 +25,7 @@ function FormImage({ className }) {
 
     const productImage = useSelector(selectProductImage);
     const isClearForm = useSelector(selectIsClearForm);
-
+    console.log("FORM IMAGE PRODUCT");
     useEffect(() => {
         setImageFiles([]);
         setImages([]);
@@ -111,4 +111,4 @@ function FormImage({ className }) {
     );
 }
 
-export default FormImage;
+export default memo(FormImage);

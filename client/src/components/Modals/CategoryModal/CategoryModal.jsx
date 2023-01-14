@@ -3,19 +3,23 @@ import { useSelector, useDispatch } from "react-redux";
 import classNames from "classnames/bind";
 
 import * as service from "../../../service/categoryService";
+import * as categoryService from "../../../service/categoryService";
 
 import Modal from "../Modal/Modal";
 import Button from "../../Buttons/Button/Button";
 import styles from "./CategoryModal.module.scss";
 
 import {
-    selectCategoryGroup,
     selectCategory,
-    selectReload,
+    selectIsClearForm,
     selectActionBtnTitle,
     selectCurrentUser,
 } from "../../../redux/selector";
-import { addReload, addToast } from "../../../redux/Slice/globalSlice";
+import {
+    reloadData,
+    addToast,
+    addClearForm,
+} from "../../../redux/Slice/globalSlice";
 import { axiosCreateJWT } from "../../../util/jwtRequest";
 import { loginSuccess, logOutSuccess } from "../../../redux/Slice/auth";
 
@@ -23,19 +27,32 @@ const cx = classNames.bind(styles);
 
 function CategoryModal({ className }) {
     const dispatch = useDispatch();
-    const reload = useSelector(selectReload);
-    const categoryGroups = useSelector(selectCategoryGroup);
+    // const categoryGroups = useSelector(selectCategoryGroup);
+    const [categoryGroups, setCategoryGroups] = useState([]);
     const categoryInfo = useSelector(selectCategory);
     const currentUser = useSelector(selectCurrentUser);
-    let actionBtnTitle = useSelector(selectActionBtnTitle);
+    const actionBtnTitle = useSelector(selectActionBtnTitle);
+    const isClearForm = useSelector(selectIsClearForm);
     const { id, fk_category_group_id, category_title } = categoryInfo;
-
     const [category, setCategory] = useState({
         categoryGroupId: "",
         categoryTitle: "",
     });
     const { categoryGroupId, categoryTitle } = category;
 
+    const categoryGroup = async () => {
+        try {
+            const response = await categoryService.getCategoryGroup();
+            setCategoryGroups(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        categoryGroup();
+    }, [dispatch]);
+    // Get category group
     useEffect(() => {
         if (categoryGroups.length > 0) {
             setCategory({
@@ -59,8 +76,8 @@ function CategoryModal({ className }) {
                 axiosCreateJWT(currentUser, dispatch, loginSuccess)
             );
             dispatch(addToast(result));
-
-            dispatch(addReload(!reload));
+            dispatch(addClearForm());
+            dispatch(reloadData());
         } catch (error) {
             console.log(error);
         }
@@ -77,12 +94,12 @@ function CategoryModal({ className }) {
                 axiosCreateJWT(currentUser, dispatch, logOutSuccess)
             );
             dispatch(addToast(result));
-            dispatch(addReload(!reload));
+            dispatch(reloadData());
         } catch (error) {
             console.log(error);
         }
     };
-
+    //Set category when update
     useEffect(() => {
         if (categoryInfo) {
             setCategory({
@@ -91,6 +108,13 @@ function CategoryModal({ className }) {
             });
         }
     }, [categoryInfo]);
+    //Clear category
+    useEffect(() => {
+        setCategory({
+            ...category,
+            categoryTitle: "",
+        });
+    }, [isClearForm]);
 
     return (
         <div>

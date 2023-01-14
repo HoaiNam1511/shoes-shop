@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import classNames from "classnames/bind";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -30,6 +30,7 @@ function FormInfo({ className }) {
         categoryCollectionId: "",
         categoryMaterialId: "",
     });
+
     const {
         productId,
         productName,
@@ -42,14 +43,16 @@ function FormInfo({ className }) {
         categoryMaterialId,
     } = product;
 
-    // Clear form after add
+    // Clear form
     useEffect(() => {
         setProduct({
+            ...product,
             productId: "",
             productName: "",
             productPrice: "",
         });
     }, [isClearForm]);
+
     // Dispatch product when change value
     useEffect(() => {
         dispatch(addProductInfo(product));
@@ -61,7 +64,7 @@ function FormInfo({ className }) {
     };
 
     // Get default initial category
-    useEffect(() => {
+    const filterInitialValue = () => {
         let initialCategoryId = categorys?.filter((category, index, arr) => {
             return (
                 index ===
@@ -83,10 +86,14 @@ function FormInfo({ className }) {
                 categoryMaterialId: initialCategoryId[4]?.id,
             });
         }
+    };
+
+    useEffect(() => {
+        filterInitialValue();
     }, [categorys]);
 
     // Set state product when action update
-    useEffect(() => {
+    const productInfoUpdate = () => {
         if (productInfo.id) {
             setProduct({
                 productId: productInfo?.id,
@@ -100,6 +107,10 @@ function FormInfo({ className }) {
                 categoryMaterialId: productInfo?.fk_category_material_id,
             });
         }
+    };
+
+    useEffect(() => {
+        productInfoUpdate();
     }, [productInfo]);
 
     return (
@@ -270,4 +281,4 @@ function FormInfo({ className }) {
     );
 }
 
-export default FormInfo;
+export default memo(FormInfo);

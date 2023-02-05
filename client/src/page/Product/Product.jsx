@@ -50,7 +50,7 @@ function Product() {
     //Get category for modal
     const getCategory = async () => {
         try {
-            const response = await categoryService.getCategory();
+            const response = await categoryService.getAllCategory();
             dispatch(addCategory(response.data));
         } catch (error) {
             console.log(error);

@@ -5,8 +5,7 @@ function useSort(dataPass, column) {
     const [data, setData] = useState(dataPass);
     const [col, setCol] = useState(column);
     const [order, setOrder] = useState("ASC");
-    console.log(data);
-    console.log("come 1");
+
     useEffect(() => {
         let newData = data;
         // e.target.innerHTML = "&#9650;";

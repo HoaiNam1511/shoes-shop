@@ -4,6 +4,7 @@ const initialState = {
     productImages: [],
     productImageFiles: [],
     product: {},
+    imagePriority: {},
 };
 
 const productSlice = createSlice({
@@ -19,11 +20,18 @@ const productSlice = createSlice({
         addProductImageFile(state, action) {
             state.productImageFiles = action.payload;
         },
+        addImagePriority(state, action) {
+            state.imagePriority = action.payload;
+        },
     },
 });
 
 //Export action
-export const { addProductInfo, addProductImage, addProductImageFile } =
-    productSlice.actions;
+export const {
+    addProductInfo,
+    addProductImage,
+    addProductImageFile,
+    addImagePriority,
+} = productSlice.actions;
 
 export default productSlice;

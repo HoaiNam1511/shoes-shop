@@ -10,7 +10,6 @@ const cx = classNames.bind(styles);
 function Modal({ children, className, title = "THIS IS TITLE" }) {
     const dispatch = useDispatch();
     let modalShow = useSelector(selectModalShow);
-    console.log("MODAL");
     const handleCloseModal = () => {
         dispatch(closeModal());
     };

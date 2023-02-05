@@ -7,8 +7,13 @@ export const getCategory = async (page = 1, sortBy = "", orderBy = "") => {
             `category?page=${page}&sortBy=${sortBy}&orderBy=${orderBy}`
         );
     } else {
-        result = await request.getRequest("category/get/");
+        result = await request.getRequest(`category/get?sortBy=id&orderBy=ASC`);
     }
+    return result.data;
+};
+//Sua lai phan nay dua len cung voi getCategory
+export const getAllCategory = async () => {
+    let result = await request.getRequest(`category/get?sortBy=id&orderBy=ASC`);
     return result.data;
 };
 

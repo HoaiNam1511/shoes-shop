@@ -1,8 +1,10 @@
+const Sequelize = require("sequelize");
 const multer = require("multer");
 const path = require("path");
+const Category = require("../models/categorys");
 const Product = require("../models/products");
 const Product_image = require("../models/product_images");
-const ITEM_PER_PAGE = 7;
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, "images");
@@ -11,6 +13,76 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + path.extname(file.originalname));
     },
 });
+
+const addPriority = (imageArray, imagePriority) => {
+    const newArrayImg = imageArray.map((item, index) => {
+        if (index === +imagePriority.image1) {
+            return {
+                ...item,
+                priority: 2,
+            };
+        } else if (index === +imagePriority.image2) {
+            return {
+                ...item,
+                priority: 1,
+            };
+        } else {
+            return {
+                ...item,
+                priority: 0,
+            };
+        }
+    });
+    return newArrayImg;
+};
+
+const filterCategoryTitle = (products, categorys) => {
+    const newCategoryProduct = products.map((product) => {
+        let categoryTitle = {};
+        categorys.map((category) => {
+            if (product.fk_category_status_id === category.id) {
+                categoryTitle.status_title = category.category_title;
+            }
+
+            if (product.fk_category_style_id === category.id) {
+                categoryTitle.style_title = category.category_title;
+            }
+
+            if (product.fk_category_line_id === category.id) {
+                categoryTitle.line_title = category.category_title;
+            }
+
+            if (product.fk_category_collection_id === category.id) {
+                categoryTitle.collection_title = category.category_title;
+            }
+
+            if (product.fk_category_material_id === category.id) {
+                categoryTitle.material_title = category.category_title;
+            }
+        });
+        //Sort data
+        const categoryTitleSortKey = Object.keys(categoryTitle)
+            .sort()
+            .reduce((obj, key) => {
+                obj[key] = categoryTitle[key];
+                return obj;
+            }, {});
+        const {
+            fk_category_status_id,
+            fk_category_style_id,
+            fk_category_line_id,
+            fk_category_collection_id,
+            fk_category_material_id,
+            ...filterValue
+        } = product.dataValues;
+        return {
+            ...filterValue,
+            categorys_title: categoryTitleSortKey,
+        };
+    });
+    return newCategoryProduct;
+};
+
 const upload = multer({ storage: storage }).array("productImages", 12);
 const createProduct = async (req, res) => {
     upload(req, res, async function () {
@@ -31,6 +103,8 @@ const createProduct = async (req, res) => {
             categoryCollectionId,
             categoryMaterialId,
         } = req.body;
+
+        const imagePriority = JSON.parse(req.body.imagePriority);
 
         try {
             await Product.create({
@@ -59,10 +133,17 @@ const createProduct = async (req, res) => {
         }
 
         //Cach 1
-        const newArrayImg = imageArray.map((item) => ({
+        // const newArrayImg = imageArray.map((item) => ({
+        //     fk_product_id: productId.id,
+        //     image: item.filename,
+        // }));
+
+        const newArrayImg = imageArray.map((item, index) => ({
             fk_product_id: productId.id,
             image: item.filename,
         }));
+
+        const newArrayImgPrioriry = addPriority(newArrayImg, imagePriority);
 
         //Cach 2
         // const insert_data = imageArray.reduce(
@@ -74,7 +155,7 @@ const createProduct = async (req, res) => {
         // );
 
         try {
-            await Product_image.bulkCreate(newArrayImg);
+            await Product_image.bulkCreate(newArrayImgPrioriry);
             res.send({
                 message: "Add product success",
                 action: "add",
@@ -86,61 +167,110 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProduct = async (req, res) => {
-    const { page, sortBy, orderBy } = req.query;
-    if (page) {
-        let offSet = (page - 1) * ITEM_PER_PAGE;
-        try {
-            const products = await Product.findAndCountAll({
-                attributes: [
-                    "id",
-                    "product_code",
-                    "product_name",
-                    "product_price",
-                    "product_sex",
-                    "fk_category_status_id",
-                    "fk_category_style_id",
-                    "fk_category_line_id",
-                    "fk_category_collection_id",
-                    "fk_category_material_id",
-                ],
-                offset: offSet,
-                limit: ITEM_PER_PAGE,
-                include: [{ model: Product_image, as: "product_images" }],
-                order: [[sortBy || "id", orderBy || "DESC"]],
-            });
-            const totalPage = await Math.ceil(products.count / ITEM_PER_PAGE);
+    const { page, sortBy, orderBy, limit = 7 } = req.query;
+    let offSet = (page - 1) * limit;
+
+    let categorys;
+    try {
+        categorys = await Category.findAll({
+            attributes: ["id", "category_title"],
+        });
+    } catch (error) {
+        console.log(error);
+    }
+
+    try {
+        //Only count for include model
+        let products = await Product.findAndCountAll({
+            attributes: [
+                "id",
+                "product_code",
+                "product_name",
+                "product_price",
+                "product_sex",
+                "fk_category_status_id",
+                "fk_category_style_id",
+                "fk_category_line_id",
+                "fk_category_collection_id",
+                "fk_category_material_id",
+            ],
+
+            offset: page ? offSet : 0,
+            limit: limit ? +limit : null,
+            include: [
+                {
+                    model: Product_image,
+                    as: "product_images",
+                    limit: page ? 20 : 2,
+                    order: [["priority", "DESC"]],
+                },
+            ],
+            order: [[sortBy || "id", orderBy || "DESC"]],
+        });
+
+        let rowCount = await Product.count();
+
+        const totalPage = await Math.ceil(rowCount / limit);
+        if (page) {
             res.send({
                 totalPage: totalPage,
                 data: products.rows,
             });
-        } catch (error) {
-            console.log(error);
+        } else {
+            const newCategoryProduct = filterCategoryTitle(
+                products.rows,
+                categorys
+            );
+            res.send(newCategoryProduct);
         }
-    } else {
-        try {
-            const products = await Product.findAndCountAll({
-                attributes: [
-                    "id",
-                    "product_code",
-                    "product_name",
-                    "product_price",
-                    "product_sex",
-                    "fk_category_status_id",
-                    "fk_category_style_id",
-                    "fk_category_line_id",
-                    "fk_category_collection_id",
-                    "fk_category_material_id",
-                ],
-                include: [{ model: Product_image, as: "product_images" }],
-                order: [[sortBy || "id", orderBy || "DESC"]],
-            });
-            res.send({
-                totalPage: products.count,
-                data: products.rows,
-            });
-        } catch (error) {
-            console.log(error);
-        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const getOneProduct = async (req, res) => {
+    const { id } = req.params;
+    let categorys;
+    try {
+        categorys = await Category.findAll({
+            attributes: ["id", "category_title"],
+        });
+    } catch (error) {
+        console.log(error);
+    }
+
+    try {
+        const product = await Product.findOne({
+            where: {
+                id: id,
+            },
+            attributes: [
+                "id",
+                "product_code",
+                "product_name",
+                "product_price",
+                "product_sex",
+                "fk_category_status_id",
+                "fk_category_style_id",
+                "fk_category_line_id",
+                "fk_category_collection_id",
+                "fk_category_material_id",
+            ],
+            include: [
+                {
+                    model: Product_image,
+                    as: "product_images",
+                    limit: 20,
+                    attributes: ["id", "image", "priority"],
+                    order: [["priority", "DESC"]],
+                },
+            ],
+        });
+        const productCategory = filterCategoryTitle([product], categorys);
+        console.log(productCategory);
+        res.send(productCategory);
+    } catch (error) {
+        console.log(error);
     }
 };
 
@@ -158,6 +288,8 @@ const updateProduct = async (req, res) => {
             categoryMaterialId,
         } = req.body;
 
+        const imagePriority = JSON.parse(req.body.imagePriority);
+
         const imageFilesArray = req.files;
         const imageFilesArr = imageFilesArray.map((item) => ({
             fk_product_id: id,
@@ -170,6 +302,8 @@ const updateProduct = async (req, res) => {
             image: item.image,
         }));
         const newArrayImg = [...imagesArr, ...imageFilesArr];
+
+        const newArrayImgPrioriry = addPriority(newArrayImg, imagePriority);
 
         try {
             await Product.update(
@@ -204,7 +338,7 @@ const updateProduct = async (req, res) => {
         }
 
         try {
-            await Product_image.bulkCreate(newArrayImg);
+            await Product_image.bulkCreate(newArrayImgPrioriry);
             res.send({
                 message: "Update category success",
                 action: "update",
@@ -214,6 +348,7 @@ const updateProduct = async (req, res) => {
         }
     });
 };
+
 const deleteProduct = async (req, res) => {
     const { id } = req.params;
     try {
@@ -236,4 +371,5 @@ module.exports = {
     getAllProduct,
     deleteProduct,
     updateProduct,
+    getOneProduct,
 };

@@ -17,6 +17,7 @@ import {
     selectProductImageFile,
     selectActionBtnTitle,
     selectCurrentUser,
+    selectImagePriority,
 } from "../../../redux/selector";
 import {
     reloadData,
@@ -34,6 +35,7 @@ function ProductModal() {
 
     const productImageFiles = useSelector(selectProductImageFile);
     const productImages = useSelector(selectProductImage);
+    const imagePriority = useSelector(selectImagePriority);
     const productStatus = useSelector(selectActionBtnTitle);
     const currentUser = useSelector(selectCurrentUser);
     let productData = new FormData();
@@ -56,6 +58,7 @@ function ProductModal() {
         setTab(e);
     };
     //Add product to formData (when have image)
+    console.log(productImages);
     const formDataFunc = () => {
         Array.from(productImageFiles).forEach((image) => {
             productData.append("productImages", image);
@@ -63,6 +66,7 @@ function ProductModal() {
         if (productStatus === "update") {
             productData.append("images", JSON.stringify(productImages));
         }
+        productData.append("imagePriority", JSON.stringify(imagePriority));
         productData.append("productName", productName);
         productData.append("productPrice", productPrice);
         productData.append("productSex", productSex);
@@ -146,26 +150,27 @@ function ProductModal() {
                 ></FormImage>
 
                 {/* //sua lai thanh wrap */}
-                {productStatus === "add" ? (
-                    <div className={cx("btn-container")}>
-                        <Button
-                            onClick={handleAddProduct}
-                            className={cx("modal-btn")}
-                        >
-                            Add
-                        </Button>
-                    </div>
-                ) : (
-                    <div className={cx("btn-container")}>
-                        <Button
-                            onClick={handleUpdateProduct}
-                            className={cx("modal-btn")}
-                        >
-                            Update
-                        </Button>
-                    </div>
-                )}
             </div>
+
+            {productStatus === "add" ? (
+                <div className={cx("btn-container")}>
+                    <Button
+                        onClick={handleAddProduct}
+                        className={cx("modal-btn")}
+                    >
+                        Add
+                    </Button>
+                </div>
+            ) : (
+                <div className={cx("btn-container")}>
+                    <Button
+                        onClick={handleUpdateProduct}
+                        className={cx("modal-btn")}
+                    >
+                        Update
+                    </Button>
+                </div>
+            )}
         </Modal>
     );
 }

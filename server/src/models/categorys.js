@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/connectDB");
 const Category_group = require("./category_groups");
+
 const Category = db.define("Categorys", {
     // Model attributes are defined here
     id: {
@@ -18,6 +19,7 @@ const Category = db.define("Categorys", {
         allowNull: false,
     },
 });
+
 Category_group.hasMany(Category, {
     foreignKey: "fk_category_group_id",
     as: "category_group",
@@ -26,4 +28,5 @@ Category.belongsTo(Category_group, {
     foreignKey: "fk_category_group_id",
     as: "category_group",
 });
+
 module.exports = Category;

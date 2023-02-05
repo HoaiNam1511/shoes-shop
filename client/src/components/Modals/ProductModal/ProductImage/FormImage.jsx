@@ -10,6 +10,7 @@ import config from "../../../../config";
 import {
     addProductImage,
     addProductImageFile,
+    addImagePriority,
 } from "../../../../redux/Slice/productSlice";
 import {
     selectProductImage,
@@ -22,10 +23,18 @@ function FormImage({ className }) {
     const dispatch = useDispatch();
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
+    const [imagePriority, setImagePriority] = useState({
+        image1: "",
+        image2: "",
+    });
+
+    const { image1, image2 } = imagePriority;
 
     const productImage = useSelector(selectProductImage);
     const isClearForm = useSelector(selectIsClearForm);
-    console.log("FORM IMAGE PRODUCT");
+
+    const allProductImage = [...images, ...imageFiles];
+
     useEffect(() => {
         setImageFiles([]);
         setImages([]);
@@ -34,15 +43,18 @@ function FormImage({ className }) {
     useEffect(() => {
         dispatch(addProductImageFile(imageFiles));
     }, [dispatch, imageFiles]);
+
     useEffect(() => {
-        console.log("set images");
         setImages(productImage);
     }, []);
-    console.log(images);
+
     useEffect(() => {
-        console.log("dispatch images");
         dispatch(addProductImage(images));
     }, [dispatch, images]);
+
+    useEffect(() => {
+        dispatch(addImagePriority(imagePriority));
+    }, [dispatch, imagePriority]);
 
     const handleUploadFile = (e) => {
         setImageFiles([...imageFiles, ...Array.from(e.target.files)]);
@@ -53,10 +65,18 @@ function FormImage({ className }) {
         imgFileArr.splice(index, 1);
         setImageFiles(imgFileArr);
     };
+
     const handleDeleteImage = (index) => {
         let imageArr = Array.from(images);
         imageArr.splice(index, 1);
         setImages(imageArr);
+    };
+
+    const handleChangeImageBackground = (e) => {
+        setImagePriority({
+            ...imagePriority,
+            [e.target.name]: e.target.value,
+        });
     };
 
     return (
@@ -74,6 +94,38 @@ function FormImage({ className }) {
                     Select a file or drag here
                 </div>
             </label>
+            <div className={cx("form-group", "flex-2")}>
+                <div className={cx("flex-item")}>
+                    <label className={cx("input-label")}>
+                        Background image 1
+                    </label>
+                    <select
+                        className={cx("select")}
+                        name="image1"
+                        value={image1}
+                        onChange={handleChangeImageBackground}
+                    >
+                        {allProductImage.map((image, index) => (
+                            <option value={index}>Image {index + 1}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className={cx("flex-item")}>
+                    <label className={cx("input-label")}>
+                        Background image 2
+                    </label>
+                    <select
+                        className={cx("select")}
+                        name="image2"
+                        value={image2}
+                        onChange={handleChangeImageBackground}
+                    >
+                        {allProductImage.map((image, index) => (
+                            <option value={index}>Image {index + 1}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
 
             <div className={cx("image-container")}>
                 {imageFiles.map((image, index) => (

@@ -1,9 +1,10 @@
 @import '../../GlobalStyle/GlobalStyle.scss';
 .wrapper {
-    width: 385px;
-    height: 477px;
+    min-width: 385px;
+    min-height: 558px;
+    position: relative;
     .content {
-        height: 423px;
+        min-height: 504px;
         .tab {
             display: flex;
             height: 35px;

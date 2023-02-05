@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 const db = require("../config/connectDB");
+const Category = require("./categorys");
 const Product_image = require("./product_images");
+
 const Product = db.define(
     "Product",
     {
@@ -50,6 +52,24 @@ const Product = db.define(
     },
     {}
 );
+
+// const ProductCategory = db.define("ProductCategorys", {
+//     MovieId: {
+//         type: DataTypes.INTEGER,
+//         references: {
+//             model: Movie, // 'Movies' would also work
+//             key: "id",
+//         },
+//     },
+//     ActorId: {
+//         type: DataTypes.INTEGER,
+//         references: {
+//             model: Actor, // 'Actors' would also work
+//             key: "id",
+//         },
+//     },
+// });
+
 Product.hasMany(Product_image, {
     foreignKey: "fk_product_id",
     as: "product_images",
@@ -58,4 +78,8 @@ Product_image.belongsTo(Product, {
     foreignKey: "fk_product_id",
     as: "product_images",
 });
+
+Product.hasOne(Category, { foreignKey: "id" });
+Category.belongsTo(Product, { foreignKey: "id" });
+
 module.exports = Product;

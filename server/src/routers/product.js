@@ -22,5 +22,9 @@ router.put(
     middlewareController.checkAdminAuth,
     productController.updateProduct
 );
+
+router.get("/:id", productController.getOneProduct);
+
 router.get("/", productController.getAllProduct);
+
 module.exports = router;

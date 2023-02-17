@@ -22,6 +22,16 @@ const Category = db.define("Categorys", {
 
 Category_group.hasMany(Category, {
     foreignKey: "fk_category_group_id",
+    as: "category_group_client",
+});
+
+Category.belongsTo(Category_group, {
+    foreignKey: "fk_category_group_id",
+    as: "category_group_client",
+});
+
+Category_group.hasMany(Category, {
+    foreignKey: "fk_category_group_id",
     as: "category_group",
 });
 Category.belongsTo(Category_group, {

@@ -19,7 +19,6 @@ import {
 
 const cx = classNames.bind(styles);
 function FormImage({ className }) {
-    // console.log("form image");
     const dispatch = useDispatch();
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);

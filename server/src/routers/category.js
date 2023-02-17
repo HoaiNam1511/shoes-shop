@@ -23,5 +23,7 @@ router.delete(
     middlewareController.checkAdminAuth,
     categoryController.deleteCategory
 );
+router.get("/categoryClient", categoryController.getCategoryClient);
 router.get("/", categoryController.getAllCategory);
+
 module.exports = router;

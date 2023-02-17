@@ -1,6 +1,7 @@
 const Category = require("../models/categorys");
 const Category_group = require("../models/category_groups");
 const ITEM_PER_PAGE = 10;
+
 const getALLCategoryGroup = async (req, res) => {
     try {
         const categoryGroups = await Category_group.findAll({
@@ -12,9 +13,26 @@ const getALLCategoryGroup = async (req, res) => {
     }
 };
 
+const getCategoryClient = async (req, res) => {
+    try {
+        const categorys = await Category_group.findAndCountAll({
+            include: [
+                {
+                    model: Category,
+                    as: "category_group_client",
+                },
+            ],
+        });
+        res.send({
+            data: categorys.rows,
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 const getAllCategory = async (req, res) => {
     const { page, sortBy, orderBy } = req.query;
-
     if (page) {
         const offset = (page - 1) * ITEM_PER_PAGE;
         try {
@@ -125,4 +143,5 @@ module.exports = {
     createCategory,
     deleteCategory,
     updateCategory,
+    getCategoryClient,
 };

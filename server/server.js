@@ -12,6 +12,8 @@ app.use(
             "http://localhost:3000",
             "http://localhost:3001",
             "http://192.168.1.12:3000",
+            "http://192.168.1.10:3000",
+            "http://192.168.1.22:3000",
             "http://172.20.10.3:3000",
         ],
         credentials: true,
@@ -22,6 +24,6 @@ app.use(express.urlencoded());
 app.use("/Images", express.static("Images"));
 
 route(app);
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

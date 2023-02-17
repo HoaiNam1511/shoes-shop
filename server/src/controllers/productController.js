@@ -4,6 +4,7 @@ const path = require("path");
 const Category = require("../models/categorys");
 const Product = require("../models/products");
 const Product_image = require("../models/product_images");
+const { Op } = require("sequelize");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -36,7 +37,16 @@ const addPriority = (imageArray, imagePriority) => {
     return newArrayImg;
 };
 
-const filterCategoryTitle = (products, categorys) => {
+const filterCategoryTitle = async (products) => {
+    let categorys;
+    try {
+        categorys = await Category.findAll({
+            attributes: ["id", "category_title"],
+        });
+    } catch (error) {
+        console.log(error);
+    }
+
     const newCategoryProduct = products.map((product) => {
         let categoryTitle = {};
         categorys.map((category) => {
@@ -60,6 +70,7 @@ const filterCategoryTitle = (products, categorys) => {
                 categoryTitle.material_title = category.category_title;
             }
         });
+
         //Sort data
         const categoryTitleSortKey = Object.keys(categoryTitle)
             .sort()
@@ -67,10 +78,11 @@ const filterCategoryTitle = (products, categorys) => {
                 obj[key] = categoryTitle[key];
                 return obj;
             }, {});
+
         const {
             fk_category_status_id,
             fk_category_style_id,
-            fk_category_line_id,
+            //fk_category_line_id,
             fk_category_collection_id,
             fk_category_material_id,
             ...filterValue
@@ -82,6 +94,19 @@ const filterCategoryTitle = (products, categorys) => {
     });
     return newCategoryProduct;
 };
+
+const atributeProduct = [
+    "id",
+    "product_code",
+    "product_name",
+    "product_price",
+    "product_sex",
+    "fk_category_status_id",
+    "fk_category_style_id",
+    "fk_category_line_id",
+    "fk_category_collection_id",
+    "fk_category_material_id",
+];
 
 const upload = multer({ storage: storage }).array("productImages", 12);
 const createProduct = async (req, res) => {
@@ -132,27 +157,12 @@ const createProduct = async (req, res) => {
             console.log(error);
         }
 
-        //Cach 1
-        // const newArrayImg = imageArray.map((item) => ({
-        //     fk_product_id: productId.id,
-        //     image: item.filename,
-        // }));
-
         const newArrayImg = imageArray.map((item, index) => ({
             fk_product_id: productId.id,
             image: item.filename,
         }));
 
         const newArrayImgPrioriry = addPriority(newArrayImg, imagePriority);
-
-        //Cach 2
-        // const insert_data = imageArray.reduce(
-        //   (accumulator, currentValue) => [
-        //     ...accumulator,
-        //     { image: currentValue.filename },
-        //   ],
-        //   []
-        // );
 
         try {
             await Product_image.bulkCreate(newArrayImgPrioriry);
@@ -170,30 +180,10 @@ const getAllProduct = async (req, res) => {
     const { page, sortBy, orderBy, limit = 7 } = req.query;
     let offSet = (page - 1) * limit;
 
-    let categorys;
-    try {
-        categorys = await Category.findAll({
-            attributes: ["id", "category_title"],
-        });
-    } catch (error) {
-        console.log(error);
-    }
-
     try {
         //Only count for include model
         let products = await Product.findAndCountAll({
-            attributes: [
-                "id",
-                "product_code",
-                "product_name",
-                "product_price",
-                "product_sex",
-                "fk_category_status_id",
-                "fk_category_style_id",
-                "fk_category_line_id",
-                "fk_category_collection_id",
-                "fk_category_material_id",
-            ],
+            attributes: [...atributeProduct],
 
             offset: page ? offSet : 0,
             limit: limit ? +limit : null,
@@ -217,10 +207,7 @@ const getAllProduct = async (req, res) => {
                 data: products.rows,
             });
         } else {
-            const newCategoryProduct = filterCategoryTitle(
-                products.rows,
-                categorys
-            );
+            const newCategoryProduct = await filterCategoryTitle(products.rows);
             res.send(newCategoryProduct);
         }
     } catch (error) {
@@ -228,34 +215,121 @@ const getAllProduct = async (req, res) => {
     }
 };
 
-const getOneProduct = async (req, res) => {
-    const { id } = req.params;
-    let categorys;
+const filterProduct = async (req, res) => {
+    const { limit } = req.params;
     try {
-        categorys = await Category.findAll({
-            attributes: ["id", "category_title"],
+        const product = await Product.findAll({
+            where: {
+                [Op.and]: {
+                    fk_category_status_id: {
+                        [Op.or]: req.body.statusId,
+                    },
+                    fk_category_style_id: {
+                        [Op.or]: req.body.styleId,
+                    },
+
+                    fk_category_line_id: {
+                        [Op.or]: req.body.lineId,
+                    },
+                    fk_category_collection_id: {
+                        [Op.or]: req.body.collectionId,
+                    },
+                    fk_category_material_id: {
+                        [Op.or]: req.body.materialId,
+                    },
+
+                    product_price: {
+                        [Op.between]: [
+                            req.body.priceRange[0]?.from || 0,
+                            req.body.priceRange[req.body.priceRange.length - 1]
+                                ?.to || 1000000000,
+                        ],
+                    },
+                },
+            },
+            attributes: [...atributeProduct],
+            include: [
+                {
+                    model: Product_image,
+                    as: "product_images",
+                    limit: 2,
+                    attributes: ["id", "image", "priority"],
+                    order: [["priority", "DESC"]],
+                },
+            ],
+            offset: 0,
+            limit: limit || 20,
         });
+        const productCategory = await filterCategoryTitle(product);
+        res.send(productCategory);
     } catch (error) {
         console.log(error);
     }
+};
 
+const findProduct = async (req, res) => {
+    let categorys;
+    const { search, limit } = req.query;
+
+    try {
+        const product = await Category.findAll({
+            where: {
+                [Op.or]: [
+                    {
+                        category_title: {
+                            [Op.like]: `%${search}%`,
+                        },
+                    },
+                    {
+                        "$products.product_name$": {
+                            [Op.like]: `%${search}%`,
+                        },
+                    },
+                    {
+                        "$products.product_price$": {
+                            [Op.like]: `%${search}%`,
+                        },
+                    },
+                ],
+            },
+            include: [
+                {
+                    model: Product,
+                    as: "products",
+                    include: [
+                        {
+                            model: Product_image,
+                            as: "product_images",
+                            limit: 2,
+                            attributes: ["id", "image", "priority"],
+                            order: [["priority", "DESC"]],
+                        },
+                    ],
+                },
+            ],
+        });
+        const productFind = product.map((item) => {
+            return item.products;
+        });
+        //Flat: loai bo mang nam trong mang
+        const productCategory = await filterCategoryTitle(
+            productFind.flat(),
+            categorys
+        );
+        res.send(productCategory);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const getOneProduct = async (req, res) => {
+    const { id } = req.params;
     try {
         const product = await Product.findOne({
             where: {
                 id: id,
             },
-            attributes: [
-                "id",
-                "product_code",
-                "product_name",
-                "product_price",
-                "product_sex",
-                "fk_category_status_id",
-                "fk_category_style_id",
-                "fk_category_line_id",
-                "fk_category_collection_id",
-                "fk_category_material_id",
-            ],
+            attributes: [...atributeProduct],
             include: [
                 {
                     model: Product_image,
@@ -266,8 +340,7 @@ const getOneProduct = async (req, res) => {
                 },
             ],
         });
-        const productCategory = filterCategoryTitle([product], categorys);
-        console.log(productCategory);
+        const productCategory = await filterCategoryTitle([product]);
         res.send(productCategory);
     } catch (error) {
         console.log(error);
@@ -372,4 +445,6 @@ module.exports = {
     deleteProduct,
     updateProduct,
     getOneProduct,
+    filterProduct,
+    findProduct,
 };

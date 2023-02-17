@@ -23,8 +23,10 @@ router.put(
     productController.updateProduct
 );
 
-router.get("/:id", productController.getOneProduct);
+router.post("/filter", productController.filterProduct);
+router.get("/find", productController.findProduct);
 
+router.get("/:id", productController.getOneProduct);
 router.get("/", productController.getAllProduct);
 
 module.exports = router;

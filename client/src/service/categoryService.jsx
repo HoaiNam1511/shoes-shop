@@ -31,7 +31,6 @@ export const addCategory = async (category, headers, axiosJWT) => {
 };
 
 export const updateCategory = async (id, category, headers, axiosJWT) => {
-    console.log(headers);
     const result = await axiosJWT.put(
         `category/update/${id}`,
         category,

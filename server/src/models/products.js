@@ -53,33 +53,35 @@ const Product = db.define(
     {}
 );
 
-// const ProductCategory = db.define("ProductCategorys", {
-//     MovieId: {
-//         type: DataTypes.INTEGER,
-//         references: {
-//             model: Movie, // 'Movies' would also work
-//             key: "id",
-//         },
-//     },
-//     ActorId: {
-//         type: DataTypes.INTEGER,
-//         references: {
-//             model: Actor, // 'Actors' would also work
-//             key: "id",
-//         },
-//     },
-// });
-
 Product.hasMany(Product_image, {
     foreignKey: "fk_product_id",
     as: "product_images",
 });
+
 Product_image.belongsTo(Product, {
     foreignKey: "fk_product_id",
     as: "product_images",
 });
 
-Product.hasOne(Category, { foreignKey: "id" });
-Category.belongsTo(Product, { foreignKey: "id" });
+// Product.hasOne(Category, { foreignKey: "id" });
+// Category.belongsTo(Product, { foreignKey: "id" });
+//Status
+Category.hasMany(Product, {
+    foreignKey: "fk_category_material_id",
+    as: "products",
+});
+Product.belongsTo(Category, {
+    foreignKey: "fk_category_material_id",
+    as: "products",
+});
+//Style
+Category.hasMany(Product, {
+    foreignKey: "fk_category_style_id",
+    as: "productStyle",
+});
+Product.belongsTo(Category, {
+    foreignKey: "fk_category_style_id",
+    as: "productStyle",
+});
 
 module.exports = Product;

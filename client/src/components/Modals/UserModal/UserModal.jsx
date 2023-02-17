@@ -105,7 +105,6 @@ function UserModal({ className }) {
     };
 
     const handleUpdateUser = async () => {
-        console.log(currentUser);
         try {
             const result = await userService.updateUser(
                 id,

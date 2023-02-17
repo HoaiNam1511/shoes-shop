@@ -52,13 +52,10 @@ function ProductModal() {
         categoryMaterialId,
     } = useSelector(selectProduct);
 
-    // console.log("form modal");
-
     const handleChangeTab = (e) => {
         setTab(e);
     };
     //Add product to formData (when have image)
-    console.log(productImages);
     const formDataFunc = () => {
         Array.from(productImageFiles).forEach((image) => {
             productData.append("productImages", image);
